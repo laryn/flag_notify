@@ -1,0 +1,163 @@
+<?php
+
+
+function are_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  //$form['account']['name']['#title'] = t('Full name');
+  //$form['account']['name']['#description'] = t('PLEASE USE YOUR FULL NAME (Name Surname). <br/>Spaces are allowed; punctuation is not allowed except for periods, hyphens, apostrophes, and underscores.');
+  $form['account']['name']['#title'] = t('Nome completo');
+  $form['account']['name']['#description'] = t('Si consiglia di utilizzare il proprio nome reale (Nome [spazio] Cognome). <br/>Gli spazi sono consentiti, gli elementi di punteggiatura non sono consentiti eccetto punti, trattini, apostrofi e caratteri di sottolineatura.');
+
+  
+}
+
+// correct the bug that default images are not accessible under private filesystem
+/*function are_file_download($uri) {
+  if (strpos($uri, "default_images") > 0) {
+    // Check that the file exists and is an image.
+    if ($info = image_get_info($uri)) {
+      return array(
+        // Send headers describing the image's size, and MIME-type...
+        'Content-Type' => $info['mime_type'],
+        'Content-Length' => $info['file_size'],
+        // By not explicitly setting them here, this uses normal Drupal
+        // Expires, Cache-Control and ETag headers to prevent proxy or
+        // browser caching of private images.
+      );
+    }
+    else {
+      return -1;
+    }
+  }
+}*/
+
+function are_file_download($uri) {
+    if (strpos($uri,"default_images") > 0) {
+        return array("Accept" => "Accept");
+    }
+}
+
+
+/**
+* Implementation of hook_form_alter().
+* Add a captcha challenge to webforms for anon users
+*/
+function are_form_alter(&$form, $form_state, $form_id) {
+  if (preg_match("/^webform_client_form_[0-9]+$/",$form_id) && user_is_logged_in() == FALSE) {
+    $form['my_captcha_element'] = array(
+      '#type' => 'captcha',
+    );
+  }
+}
+
+/* Doesn't work.. this code is never called, so I need to patch directly the module on
+  video_embed_field.handlers.inc */
+  
+/*
+ *  Generate the embed code for a video
+ *  @param $url - the video url as entered by the user
+ *  @param $settings - the settings for this provider as defined in the form function, 
+ *                      defaulting to your provider's defaults
+ *  @return the embed code as a renderable array
+ */
+
+ /*
+function are_handle_youtube($url, $settings) {
+  dpm("I'm in are_handle_youtube");
+  $output = array();
+  $id = _video_embed_field_get_youtube_id($url);
+  if (!$id) {
+    // We can't decode the URL - just return the URL as a link
+    $output['#markup'] = l($url, $url);
+    return $output;
+  }
+  unset($settings['start']);
+  $output['#markup'] = '<iframe width="' . $settings['width'] . '" height="' . $settings['height'] . '" src="//www.youtube.com/embed/' . $id . '?' . $settings_str . '" frameborder="0" allowfullscreen></iframe>';
+
+  return $output;
+ }
+*/
+
+
+
+
+
+
+/*
+//http://blog.sebcorbin.fr/en/how-force-downloading-file-drupal-7
+function are_menu() {
+  $items['download/%file'] = array(
+    'page callback' => 'are_download_file',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+ 
+//
+//Page callback for forcing a file to download
+//
+function are_download_file($file) {
+  if($file) {
+    file_transfer($file->uri, array('Content-disposition', 'attachment; filename='.$file->filename));
+  }
+  else {
+    return drupal_access_denied();
+  }
+}
+*/
+
+// Exposed filters colalpsed by default
+// http://drupal.org/node/1224284
+/*
+function are_preprocess_views_view(&$vars) {
+  // move exposed filters into a fieldset
+  if ($vars['exposed']) {
+    drupal_add_js('misc/form.js');
+    drupal_add_js('misc/collapse.js');
+   
+    // Default collapsed
+    $collapsed = TRUE;
+    $class = array('collapsible', 'collapsed');
+   
+    if (count($_GET) > 1){
+      // assume other get vars are exposed filters, so expand fieldset
+      // to show applied filters
+      $collapsed = FALSE;
+      $class = array('collapsible');
+    }
+   
+    $matches = array();
+    if (!preg_match('/(<form.+?>)(.+?)(<\/form>)/', str_replace("\n", ' ', $vars['exposed']), $matches)) {
+      return;
+    }
+
+    $fieldset['element'] = array(
+      '#title'        => t('Filter activities'),
+      '#collapsible'  => TRUE,
+      '#collapsed'    => $collapsed,
+      '#attributes'   => array('class' => $class),
+      '#children'     => $matches[2],
+    );
+    $vars['exposed'] = $matches[1] . theme('fieldset', $fieldset) . $matches[3];
+  }
+}
+*/
+
+// // Adding noindex for "private" nodes
+// function are_entity_view($entity, $type, $view_mode, $langcode) {
+//   if ($type == 'node' && $entity->type == 'fi_project') {
+//     // Check the field items.
+//     if ($items = field_get_items('node', $entity, 'field_visibility')) {
+//       if ($items[0]['value'] == '0') {
+//         $element = array(
+//           '#tag' => 'meta',
+//           '#attributes' => array(
+//             'name' => 'robots',
+//             'content' => 'noindex',
+//           ),
+//         );
+//         drupal_add_html_head($element, 'robots');
+//       }
+//     }
+//   }
+// }
