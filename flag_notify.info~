@@ -1,8 +1,1 @@
-name = "Flag Notify"
-description = "Uses the flag module to subscribe to comments, nodes or groups."
-core = 7.x
-package = Flag
-
-dependencies[] = flag
-
-configure = admin/config/system/flag_notify
+name = Flag Notify

@@ -12,3 +12,20 @@ content|New comments and modifications on content you create
 comment|Replies to your comments
 
 These defaults affect only new users, so if you install this module on a established site you have to give users the default options you require.
+
+Required modules:
+Flags
+-> an easy-to-be-imported export of flags will be provided
+
+Suggested modules
+queue_mail
+-> to put emails on a queue instead of firing them all in one
+-> add the flag_notify send emails function in the queue configuration page
+
+Views+view bulk operation
+-> to provide users with nice view of the group/content/comment they flagged to receive notification and remove them
+-> an easy-to-be imported export view will be provided
+
+
+Field Permissions
+-> to make private the user default notification option field

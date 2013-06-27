@@ -70,10 +70,17 @@ function flag_notify_install() {
  * Implements hook_uninstall().
  */
 function flag_notify_uninstall() {
-  variable_del('flag_notify_flag_group_mname');
+  /*variable_del('flag_notify_flag_group_mname');
   variable_del('flag_notify_flag_node_mname');
   variable_del('flag_notify_flag_comment_mname');
   variable_del('flag_notify_use_default_events');
+  variable_del('flag_notify_url_manage_notifications');
+  variable_del('flag_notify_email_footer');*/
+  
+  db_delete('variable')
+   ->where('name', "flag_notify_%", 'LIKE');
+  
+  
   
   $default_notification_field_name = "field_notification_defaults";
   $field_instance = array(
