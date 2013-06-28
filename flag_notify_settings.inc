@@ -10,8 +10,6 @@
  */
 function flag_notify_admin($form, &$form_state) {
 
-
-
   $form['flag_notify_flag_group_mname'] = array(
     '#type' => 'textfield',
     '#title' => t('The machine name of the flag to be notified of group activity'),
@@ -45,7 +43,7 @@ function flag_notify_admin($form, &$form_state) {
     '#default_value' => variable_get('flag_notify_url_manage_notifications', ''),
     '#size' => 80,
     '#maxlength' => 255,
-    '#description' => t('A relative URL (if any) where you allow users to manage their subscription, typically using a view. If provided, a text like "manage your notification" will be added at the end of each sent email. Provide a URL relative to drupal root, starting without "/".'),
+    '#description' => t('A relative URL (if any) where you allow users to manage their subscriptions, typically using a view. If provided, a text like "manage your notifications" will be added at the end of each sent email. Please provide a URL relative to drupal root, starting without "/".'),
     '#required' => FALSE,
   );
   $form['flag_notify_email_salutation'] = array(
@@ -66,7 +64,6 @@ function flag_notify_admin($form, &$form_state) {
     '#description' => t('An optional email footer. Sorry plain test, don\'t include HTML markup'),
     '#required' => FALSE,
   );
-
   $useDefaultEvents = array(
     '1' => t('True'),
     '0' => t('False'),

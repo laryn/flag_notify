@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * Functions for this module.
@@ -10,8 +9,6 @@
  * Load the necessary include files.
  */
 module_load_include('inc', 'flag_notify', 'flag_notify_settings');
-
-
 
 /**
  * Valid permissions for this module
@@ -40,7 +37,6 @@ function flag_notify_help($path, $arg) {
   }
 }
 
-
 /**
  * Menu for this module
  * @return array An array with this module's settings.
@@ -54,7 +50,6 @@ function flag_notify_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_notify_admin'),
     'access arguments' => array('administer flag notify'),
-
     //'type' => MENU_NORMAL_ITEM,  // Not necessary since this is the default.
     'weight' => 0,
   );
@@ -81,7 +76,6 @@ function flag_notify_menu() {
   return $items;
 }
 
-
 /**
  * Redirect to the module's permission settings. A callback from hook_menu().
  */
@@ -90,10 +84,7 @@ function flag_notify_perms() {
 }
 
 
-
-
 // ****************** logic of the module starts here *************************
-
 
 /**
  * Implements hook_comment_publish($comment).
@@ -240,7 +231,6 @@ function flag_notify_og_membership_insert(OgMembership $og_membership) {
       break;
     }
   }
-
 }
 
 /**
@@ -343,7 +333,10 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
     for ($i = 0; $i < (count($threads) -1); $i++) {
       $thread .= $threads[$i];
       $local_thread = $thread . "/";
-      $result = db_query('SELECT c.cid FROM {comment} c WHERE c.nid = :nid AND c.thread = :thread AND c.status = :status', array(':nid' => $comment->nid, ':thread' => $local_thread, ':status' => '1'));
+      $result = db_query(
+        'SELECT c.cid FROM {comment} c WHERE c.nid = :nid AND c.thread = :thread AND c.status = :status',
+        array(':nid' => $comment->nid, ':thread' => $local_thread, ':status' => '1')
+      );
       foreach ($result as $record) {
         $pnids[] = $record->cid;
       }
@@ -363,7 +356,8 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
   if ($flag_notify_flag_content_mname && $event != 'new_user') {
     $users_content_data = flag_get_entity_flags('node', $node->nid, $flag_notify_flag_content_mname);
     foreach ($users_content_data as $user_content_data) {
-      if ((! array_key_exists($user_content_data->uid, $users_comment)) && (! array_key_exists($user_content_data->uid, $users_content))) {
+      if ((! array_key_exists($user_content_data->uid, $users_comment)) &&
+          (! array_key_exists($user_content_data->uid, $users_content))) {
         $users_content[$user_content_data->uid] = $user_content_data->uid;
       }
     }
@@ -374,7 +368,9 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
     foreach ($groups as $group) {
       $users_group_data = flag_get_entity_flags('node', $group->nid, $flag_notify_flag_group_mname);
       foreach ($users_group_data as $user_group_data) {
-        if ((! array_key_exists($user_group_data->uid, $users_comment)) && (! array_key_exists($user_group_data->uid, $users_content)) && (! array_key_exists($user_group_data->uid, $users_group))) {
+        if ((! array_key_exists($user_group_data->uid, $users_comment)) &&
+            (! array_key_exists($user_group_data->uid, $users_content)) &&
+            (! array_key_exists($user_group_data->uid, $users_group))) {
           $users_group[$user_group_data->uid] = $group; //here we need also the group information for the email
         }
       }
@@ -405,9 +401,7 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
   http://drupal.stackexchange.com/questions/54996/how-to-use-drupal-mail-to-send-emails-with-custom-template
   http://drupal.stackexchange.com/questions/28431/drupal-mail-in-html
   http://stackoverflow.com/questions/12528011/drupal-mail-html
-
   */
-
 }
 
 /**
@@ -453,7 +447,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     return; // no need to send notification to the acting user!
   }
 
-
   /**
    * Possible [notification-type] / [event-type] matches:
    * - comment - new_comment
@@ -465,10 +458,8 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
    * - group - new_users
    */
 
-
   $subject = "[" . $site_name . "] ";
   $msg = "";
-
 
   if ($notification_type == 'comment') {
 
@@ -480,9 +471,9 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     if (isset($cbody_field)) {
       $cbody = $cbody_field[0]['value'];
     }
-
     $subject .= t('New comment reply.');
-    $msg .= t("!salutation !tuser_name, a comment you subscribed received a reply:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
+    $msg .= t("!salutation !tuser_name, a comment you subscribed received a reply:\n\n",
+      array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
     $msg .= t("Title") . ": " . $comment->subject . "\n";
     $msg .= t("Author") . ": " . $user->name . "\n";
     $msg .= t("In content") . ": " . $node->title . "\n";
@@ -509,7 +500,8 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       }
 
       $subject .= t('Notification of new comment on a content you are following.');
-      $msg .= t("!salutation !tuser_name, a comment has been sent in a content you subscribed:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
+      $msg .= t("!salutation !tuser_name, a comment has been sent in a content you subscribed:\n\n",
+        array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
       $msg .= t("Comment title") . ": " . $comment->subject . "\n";
       $msg .= t("Comment author") . ": " . $user->name . "\n";
       $msg .= t("In content") . ": " . $node->title . " (" . $node->type . ")\n";
@@ -538,7 +530,8 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     $msg .= t("Browse !user_name profile", array('!user_name' => $user->name)) . ": " . $base_url . "/user/" . $user->uid . "\n";
     $msg .= "-----------------\n";
     $msg .= "*** " . t('MANAGE NOTIFICATIONS') . " ***\n";
-    $msg .= t("Comments and modifications of this content") . ": " . t('click the "!unflag_text" link on the content', array('!unflag_text' => $unflag_text)) . "\n";
+    $msg .= t("Comments and modifications of this content") . ": " . 
+      t('click the "!unflag_text" link on the content', array('!unflag_text' => $unflag_text)) . "\n";
 
   }
   elseif ($notification_type == 'group') {
@@ -553,7 +546,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       if (isset($cbody_field)) {
         $cbody = $cbody_field[0]['value'];
       }
-
       $subject .= t('New comment');
       $msg .= t("!salutation !tuser_name, a comment has been sent in a group you subscribed:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
       $msg .= t("Comment title") . ": " . $comment->subject . "\n";
@@ -564,7 +556,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       $msg .= "-----------------\n";
       $msg .= "*** " . t('ACTIONS') . " ***\n";
       $msg .= t("Read the comment in context and reply") . ": " . $base_url . "/comment/" . $comment->cid . "#comment-" . $comment->cid . "\n";
-
     }
     elseif ($event == 'edited_content') {
 
@@ -626,12 +617,10 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     $msg .= $flag_notify_email_footer;
   }
 
-
   if ($debug) {
     dpm("** Debugging flag_notify_fire_email **");
     dpm("Subject: ");
     dpm($subject);
-
     dpm("Message:");
     dpm($msg);
   }
@@ -639,7 +628,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   $params = array();
   $params['subject'] = $subject;
   $params['body'] = $msg;
-
 
   // http://drupalcode.org/project/examples.git/blob_plain/refs/heads/7.x-1.x:/email_example/email_example.module
   // $result = drupal_mail($module, $key, $to, $language, $params, $from, $send);
@@ -651,7 +639,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   if ($result['result'] != TRUE) {
     watchdog('flag_notify', 'There was a problem sending the notification and it was not sent.', NULL, WATCHDOG_ERROR);
   }
-
 }
 
 /**

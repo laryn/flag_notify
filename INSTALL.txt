@@ -1,0 +1,47 @@
+FLAG NOTIFY DRUPAL MODULE
+
+A simple but flexible module that uses the great flag module for email
+notifications of site activity and optionally integrates with organic groups.
+
+** Required modules**
+Flags
+-> an easy-to-be-imported export of flags will be provided
+
+** Suggested modules **
+queue_mail
+-> to put emails on a queue instead of firing them all in one
+-> add the flag_notify send emails function in the queue configuration page
+(add "flag_notify_*" in the "Mail IDs to queue" form under admin/config/system/queue_mail page). 
+
+Views+view bulk operation
+-> to provide users with nice view of the group/content/comment they flagged
+to receive notification and remove them
+-> an easy-to-be imported export view will be provided
+
+Field Permissions
+-> to make private the user default notification option field
+
+** INSTALLATION INSTRUCTIIONS **
+
+1) Download and enable the og module before Flag Notify if you want to use
+group notification
+2) Download and enable the module like normal
+3) Create the flags for comment, content and group notification (e.g. "Subscribe
+to this content") on admin/structure/flags.
+Any of these three levels is optional.
+4) Configure Flag Notify under admin/config/system/flag_notify
+5) Optionally create a view (e.g. with View Bulk Operation) to allow users to
+manage their notification
+
+** Troubles **
+1) If you install the og module AFTER having installed this module and you want
+to use this module for notification of group activity you have to manually edit
+the field "field_notification_defaults" to include a default option for group
+activity notifications and give it the 'group' key, e.g. in "allowed values" you
+will have:
+group|Activity in the groups you join
+content|New comments and modifications on content you create
+comment|Replies to your comments
+These defaults affect only new users, so if you install this module on a
+established site you have to give users the default options you require.
+
