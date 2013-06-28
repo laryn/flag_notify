@@ -4,13 +4,13 @@ A simple but flexible module that uses the great flag module for email
 notifications of site activity and optionally integrates with organic groups.
 
 It uses a hierarchical notification system organised in three levels:
-groups,nodes,comment, where users are always notified only once for the same
+groups,nodes,comments, where users are always notified only once for the same
 event, with preference to the most relevant for them (i.e. a reply to own
 comment is notified as such rather than "there is a comment in your group").
 
 Flag Notify purposely do not build the flags in code (it just ask for the flag
-machine name), not it creates views of elements that have been subscribed.
-While this approach require little bit extra work from the user, it increases
+machine name), nor it creates views of elements that have been subscribed.
+While this approach require little bit extra work from the users, it increases
 the flexibility and avoid potential problems if the og module is enabled/disabled
 after this module.
 If necessary, I can provide an export of flags and/or views.

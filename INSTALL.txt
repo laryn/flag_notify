@@ -44,4 +44,3 @@ content|New comments and modifications on content you create
 comment|Replies to your comments
 These defaults affect only new users, so if you install this module on a
 established site you have to give users the default options you require.
-

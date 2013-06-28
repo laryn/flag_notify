@@ -45,8 +45,8 @@ function flag_notify_menu() {
   $items = array();
 
   $items['admin/config/system/flag_notify'] = array(
-    'title' => t('Flag Notify'),
-    'description' => t('Configure Flag Notify module'),
+    'title' => 'Flag Notify',
+    'description' => 'Configure Flag Notify module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_notify_admin'),
     'access arguments' => array('administer flag notify'),
@@ -56,7 +56,7 @@ function flag_notify_menu() {
 
   // For the default local task, we need very little configuration, as the callback and other conditions are handled by the parent callback.
   $items['admin/config/system/flag_notify/settings'] = array(
-    'title' => t('Settings'),
+    'title' => 'Settings',
 
     //'description' => 'General settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -65,8 +65,8 @@ function flag_notify_menu() {
 
   // A shortcut to the permissions settings for this module.
   $items['admin/config/system/flag_notify/permissions'] = array(
-    'title' => t('Permissions'),
-    'description' => t('Configure access permissions'),
+    'title' => 'Permissions',
+    'description' => 'Configure access permissions',
     'page callback' => 'flag_notify_perms',
     'access arguments' => array('administer flag notify'),
     'type' => MENU_LOCAL_TASK,
@@ -524,7 +524,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
     }
     else {
-      watchdog('flag_notify', t('Got an unknow event under "content" notification_type. Don\'t know how to handle it'));
+      watchdog('flag_notify', 'Got an unknow event under "content" notification_type. Don\'t know how to handle it');
       return;
     }
     $msg .= t("Browse !user_name profile", array('!user_name' => $user->name)) . ": " . $base_url . "/user/" . $user->uid . "\n";
@@ -593,7 +593,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       $msg .= "*** " . t('ACTIONS') . " ***\n";
     }
     else {
-      watchdog('flag_notify', t('Got an unknow event under "group" notification_type. Don\'t know how to handle it'));
+      watchdog('flag_notify', 'Got an unknow event under "group" notification_type. Don\'t know how to handle it');
       return;
     }
 
@@ -605,7 +605,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
   }
   else {
-    watchdog('flag_notify', t('Got an unknow notification_type. Don\'t know how to handle it'));
+    watchdog('flag_notify', 'Got an unknow notification_type. Don\'t know how to handle it');
     return;
   }
 

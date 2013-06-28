@@ -1,0 +1,362 @@
+# $Id$
+#
+# Italian translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  flag_notify_settings.inc: n/a
+#  flag_notify.module: n/a
+#  flag_notify.info: n/a
+#  flag_notify.install: n/a
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2013-06-28 17:38+0200\n"
+"PO-Revision-Date: 2013-06-28 18:06+0100\n"
+"Last-Translator: Antonello Lobianco <blackhole@lobianco.org>\n"
+"Language-Team: Italian <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: flag_notify_settings.inc:15
+msgid "The machine name of the flag to be notified of group activity"
+msgstr "Il nome macchina del flag per le notifiche dell'attività del gruppo"
+
+#: flag_notify_settings.inc:19
+msgid "In the flag module create a \"Receive notifications of this group's activity\" flag and write here its machine name."
+msgstr "Nel modulo flag crea un flag \"Ricevi notifiche dell'attività di questo gruppo\" e scrivi qui il suo nome macchina."
+
+#: flag_notify_settings.inc:24
+msgid "The machine name of the flag to be notified of activity related to this content"
+msgstr "Il nome macchina del flag per le notifiche dell'attività relativa a questo contenuto"
+
+#: flag_notify_settings.inc:28
+msgid "In the flag module create a \"Receive notifications of this content's activity\" flag and write here its machine name."
+msgstr "Nel modulo flag crea un flag \"Ricevi notifiche dell'attività relativa a questo contenuto\" e scrivi qui il suo nome macchina."
+
+#: flag_notify_settings.inc:33
+msgid "The machine name of the flag to be notified of replied to this comment."
+msgstr "Il nome macchina del flag per le notifiche delle risposte a questo contenuto."
+
+#: flag_notify_settings.inc:37
+msgid "In the flag module create a \"Receive notifications of replies to this comment\" flag and write here its machine name."
+msgstr "Nel modulo flag crea un flag \"Ricevi notifiche delle risposte a questo commento\" e scrivi qui il suo nome macchina."
+
+#: flag_notify_settings.inc:42
+msgid "Manage own notifications URL"
+msgstr "URL della pagina di gestione delle proprie notifiche"
+
+#: flag_notify_settings.inc:46
+msgid "A relative URL (if any) where you allow users to manage their subscriptions, typically using a view. If provided, a text like \"manage your notifications\" will be added at the end of each sent email. Please provide a URL relative to drupal root, starting without \"/\"."
+msgstr "Un URL ad una pagina (se esistente) dove permetti agli utenti di gestire le loro notifiche, tipicamente attraverso una vista. Se fornito, un test osimile a \"gestisci le tue notifiche\" sarà inserito alla fine di ciascuna email inviata. Fornisci un URL relativo alla root di Drupal, senza il carattere \"/\" iniziale."
+
+#: flag_notify_settings.inc:51
+msgid "Email salutation"
+msgstr "Saluto iniziale nell'email"
+
+#: flag_notify_settings.inc:52
+#: flag_notify.module:438
+msgid "Dear"
+msgstr "Caro"
+
+#: flag_notify_settings.inc:55
+msgid "How to address your users?"
+msgstr "Come rivolgersi ai tuoi utenti ?"
+
+#: flag_notify_settings.inc:60
+msgid "Email footer"
+msgstr "Footer dell'email"
+
+#: flag_notify_settings.inc:64
+msgid "An optional email footer. Sorry plain test, don't include HTML markup"
+msgstr "Un footer opzionale per l'email. Spiacenti, solo testo semplice. Non includere markup HTML"
+
+#: flag_notify_settings.inc:68
+msgid "True"
+msgstr "Vero"
+
+#: flag_notify_settings.inc:69
+msgid "False"
+msgstr "Falso"
+
+#: flag_notify_settings.inc:73
+msgid "Use default events"
+msgstr "Utilizza la gestione degli eventi di default"
+
+#: flag_notify_settings.inc:75
+msgid "Flag Notify already comes with its own event handler (node comment, node edit..). If you prefer instead to call directly <em>node_flag_main()</em>, e.g. using rules, change this option to <em>FALSE</em>"
+msgstr "Flag Notify è già fornita della sua gestione degli eventi (comemnti ai nodi, modifiche ai nodi..). Se preferisci invece chiamare direttamente <em>node_flag_main()</em>, ad es. utilizzando le regole, cambia questa opzione in <em>FALSO</em>"
+
+#: flag_notify.module:20
+msgid "Administer Flag Notify"
+msgstr "Gestisci Flag Notify"
+
+#: flag_notify.module:21
+msgid "Set roles that may access the settings of Flag Notify."
+msgstr "Specifica i ruoli che possono avere accesso a Flag Notify."
+
+#: flag_notify.module:48
+#: flag_notify.info:0
+msgid "Flag Notify"
+msgstr "Flag Notify"
+
+#: flag_notify.module:49
+msgid "Configure Flag Notify module"
+msgstr "Configura il modulo Flag Notify"
+
+#: flag_notify.module:59
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: flag_notify.module:68
+msgid "Permissions"
+msgstr "Permessi"
+
+#: flag_notify.module:69
+msgid "Configure access permissions"
+msgstr "Cionfigura i permessi di accesso"
+
+#: flag_notify.module:474
+msgid "New comment reply."
+msgstr "Nuove risposte ad un commento."
+
+#: flag_notify.module:475
+msgid ""
+"!salutation !tuser_name, a comment you subscribed received a reply:\n"
+"\n"
+msgstr "!salutation !tuser_name, un commento che hai sottoscritto ha ricevuto una risposta: "
+
+#: flag_notify.module:477;517;564;576
+msgid "Title"
+msgstr "Titolo"
+
+#: flag_notify.module:478;579
+msgid "Author"
+msgstr "Autore"
+
+#: flag_notify.module:479;507;553
+msgid "In content"
+msgstr "Nel contenuto"
+
+#: flag_notify.module:480;508;555
+msgid "Comment"
+msgstr "Commento"
+
+#: flag_notify.module:482;510;522;557;569;581;593
+msgid "ACTIONS"
+msgstr "AZIONI"
+
+#: flag_notify.module:483;511;558
+msgid "Read the comment in context and reply"
+msgstr "Leggi il commento nel contesto e rispondi"
+
+#: flag_notify.module:484;530;600
+msgid "Browse !user_name profile"
+msgstr "Visualizza il profilo di !user_name"
+
+#: flag_notify.module:486;532;603
+msgid "MANAGE NOTIFICATIONS"
+msgstr "GESTISCI LE NOTIFICHE"
+
+#: flag_notify.module:487
+msgid "Replies to this comment"
+msgstr "Rispondi a questo commento"
+
+#: flag_notify.module:487
+msgid "click the \"!unflag_text\" link on the comment"
+msgstr "Clicca il link \"!unflag_text\" sul commento"
+
+#: flag_notify.module:502
+msgid "Notification of new comment on a content you are following."
+msgstr "Notifica di un nuovo commento in un contenuto che stai seguendo."
+
+#: flag_notify.module:503
+msgid ""
+"!salutation !tuser_name, a comment has been sent in a content you subscribed:\n"
+"\n"
+msgstr ""
+"!salutation !tuser_name, un commento a cui sei sottoscritto ha ricevuto una risposta:\n"
+"\n"
+
+#: flag_notify.module:505;551
+msgid "Comment title"
+msgstr "Titolo del commento"
+
+#: flag_notify.module:506;552
+msgid "Comment author"
+msgstr "Autore del commento"
+
+#: flag_notify.module:515
+msgid "Notification of content modified."
+msgstr "Notifica di contenuto modificato."
+
+#: flag_notify.module:516
+msgid ""
+"!salutation !tuser_name, a content you are subscribed has been edited:\n"
+"\n"
+msgstr ""
+"!salutation !tuser_name, un contenuto a cui sei sottoscritto è stato modificato:\n"
+"\n"
+
+#: flag_notify.module:518;565;577
+msgid "Type"
+msgstr "Tipo"
+
+#: flag_notify.module:519;567
+msgid "Author of the editing(s)"
+msgstr "Autore della modifica"
+
+#: flag_notify.module:523
+msgid "View the content"
+msgstr "Visualizza il contenuto"
+
+#: flag_notify.module:527
+msgid "Got an unknow event under \"content\" notification_type. Don't know how to handle it"
+msgstr "Ho ricevuto un evento sconosciuto assieme a notification_type \"content\". Non so come gestirlo."
+
+#: flag_notify.module:533
+msgid "Comments and modifications of this content"
+msgstr "Commenti e modifiche di questo contenuto"
+
+#: flag_notify.module:534
+msgid "click the \"!unflag_text\" link on the content"
+msgstr "clicca il link \"!unflag_text\" nel contenuto"
+
+#: flag_notify.module:549
+msgid "New comment"
+msgstr "Nuovo commento"
+
+#: flag_notify.module:550
+msgid ""
+"!salutation !tuser_name, a comment has been sent in a group you subscribed:\n"
+"\n"
+msgstr ""
+"!salutation !tuser_name, un commento è stato inviato in un gruppo che hai sottoscritto:\n"
+"\n"
+
+#: flag_notify.module:554;566;578;590
+msgid "In group"
+msgstr "Nel gruppo"
+
+#: flag_notify.module:562
+msgid "Content modified."
+msgstr "Contenuto modificato."
+
+#: flag_notify.module:563
+msgid ""
+"!salutation !tuser_name, a content in a group you subscribed has been edited:\n"
+"\n"
+msgstr ""
+"!salutation !tuser_name, un contenuto di un gruppo che hai sottoscritto è stato modificato:\n"
+"\n"
+
+#: flag_notify.module:570
+msgid "View the edited content"
+msgstr "Visualizza il contenuto modificato"
+
+#: flag_notify.module:574
+msgid "New content."
+msgstr "Nuovo contenuto."
+
+#: flag_notify.module:575
+msgid ""
+"!salutation !tuser_name, a content has been posted in a group you subscribed:\n"
+"\n"
+msgstr ""
+"!salutation !tuser_name, un contenuto è stato inviato in un gruppo che hai sottoscritto:\n"
+"\n"
+
+#: flag_notify.module:582
+msgid "View the new content"
+msgstr "Visualizza il nuovo contenuto"
+
+#: flag_notify.module:586
+msgid "New user."
+msgstr "Nuovo utente."
+
+#: flag_notify.module:587
+msgid ""
+"!salutation !tuser_name, a new user has joined a group you subscribed:\n"
+"\n"
+msgstr ""
+"!salutation !tuser_name, un nuovo utente si è iscritto in un gruppo:\n"
+"\n"
+
+#: flag_notify.module:589
+msgid "New user"
+msgstr "Nuovo utente"
+
+#: flag_notify.module:596
+msgid "Got an unknow event under \"group\" notification_type. Don't know how to handle it"
+msgstr "Ho ricevuto un evento sconosciuto assieme a notification_type \"group\". Non so come gestirlo."
+
+#: flag_notify.module:601
+msgid "Visit the group homepage"
+msgstr "Visita l'home page del gruppo"
+
+#: flag_notify.module:604
+msgid "Activity of this group"
+msgstr "Attività di questo gruppo"
+
+#: flag_notify.module:604
+msgid "click the \"!unflag_text\" link on the group home page"
+msgstr "clicca il link \"!unflag_text\" nell'home page del gruppo"
+
+#: flag_notify.module:608
+msgid "Got an unknow notification_type. Don't know how to handle it"
+msgstr "Ho ricevuto un  notification_type sconosciuto. Non so come gestirlo."
+
+#: flag_notify.module:613
+msgid "Manage all your notifications"
+msgstr "Gestisci tutte le tue notifiche"
+
+#: flag_notify.module:615
+msgid "Manage your defaults"
+msgstr "Gestisci i tuoi defaults"
+
+#: flag_notify.module:615
+msgid "Edit your user profile and set the \"Default settings for notifications\" options according to your needs."
+msgstr "Modifica il tuo profilo utente ed imposta le \"Opzioni di default delle notifiche\" a seconda delle tue esigenze."
+
+#: flag_notify.module:640
+msgid "flag_notify"
+msgstr "flag_notify"
+
+#: flag_notify.module:640
+msgid "There was a problem sending the notification and it was not sent."
+msgstr "C'è stato un problema con l'invio della notifica e l'email non è stata spedita."
+
+#: flag_notify.install:16
+msgid "Select the ​​default notification options for the contents you create and the replies to your comments. These default options can then be modified on a content or comment base."
+msgstr "Seleziona le opzioni di notifica di default per i contenuti che invii e le risposte ai tuoi commenti. Queste opzioni di default possono poi essere modificate su ciascun contenuto o commento."
+
+#: flag_notify.install:18;30
+msgid "New comments and modifications on content you create"
+msgstr "Commenti e modifiche ai contenuti che crei"
+
+#: flag_notify.install:19;31
+msgid "Replies to your comments"
+msgstr "Le risposte ai tuoi commenti"
+
+#: flag_notify.install:27
+msgid "Select the ​​default notification options for the groups to which you join, the contents you create and the replies to your comments. These default options can then be modified on a per-group, content or comment base."
+msgstr "Seleziona le opzioni di notifica di default per i gruppi a cui ti iscrivi, icontenuti che invii e le risposte ai tuoi commenti. Queste opzioni di default possono poi essere modificate su ciascun gruppo, contenuto o commento."
+
+#: flag_notify.install:29
+msgid "Activity in the groups you join"
+msgstr "Le attività nei gruppi ai quali ti iscrivi"
+
+#: flag_notify.install:53
+msgid "Default settings for notifications"
+msgstr "Opzioni di default delle notifiche"
+
+#: flag_notify.info:0
+msgid "Uses the flag module to subscribe to comments, nodes or groups."
+msgstr "Utilizza il modulo flag per le sottoscrizioni ai commenti, nodi o gruppi."
+
+#: flag_notify.info:0
+msgid "Flags"
+msgstr "Flags"
+
