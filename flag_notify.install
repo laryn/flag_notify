@@ -77,7 +77,7 @@ function flag_notify_uninstall() {
   field_delete_instance($field_instance);
   field_delete_field($default_notification_field_name);
 
-  // http://stackoverflow.com/questions/13608852/how-to-remove-traces-of-fields-that-belonged-to-a-module-content-type
+  // http://stackoverflow.com/questions/13608852
   // https://drupal.org/node/1203876
   field_purge_batch(30);
   field_purge_batch(30);

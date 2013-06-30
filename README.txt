@@ -11,8 +11,8 @@ comment is notified as such rather than "there is a comment in your group").
 Flag Notify purposely do not build the flags in code (it just ask for the flag
 machine name), nor it creates views of elements that have been subscribed.
 While this approach require little bit extra work from the users, it increases
-the flexibility and avoid potential problems if the og module is enabled/disabled
-after this module.
+the flexibility and avoid potential problems if the og module is
+enabled/disabled after this module.
 If necessary, I can provide an export of flags and/or views.
 
 Default notification for users are managed trough an option field in user

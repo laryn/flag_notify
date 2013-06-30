@@ -8,12 +8,13 @@ Flags
 -> an easy-to-be-imported export of flags will be provided
 
 ** Suggested modules **
-queue_mail
+Queue mail
 -> to put emails on a queue instead of firing them all in one
 -> add the flag_notify send emails function in the queue configuration page
-(add "flag_notify_*" in the "Mail IDs to queue" form under admin/config/system/queue_mail page). 
+(add "flag_notify_*" in the "Mail IDs to queue" form under
+admin/config/system/queue_mail page). 
 
-Views+view bulk operation
+Views + View bulk operation
 -> to provide users with nice view of the group/content/comment they flagged
 to receive notification and remove them
 -> an easy-to-be imported export view will be provided

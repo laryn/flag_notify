@@ -29,12 +29,12 @@ function flag_notify_permission() {
  *
  * Implements hook_help().
  *
- * @param $path 
+ * @param string $path
  *   Which path of the site we're displaying help.
- * @param $arg
+ * @param array $arg
  *   Array that holds the current path as would be returned from arg() function.
  *
- * @return
+ * @return string
  *   Help text for the path.
  */
 function flag_notify_help($path, $arg) {
@@ -69,7 +69,8 @@ function flag_notify_menu() {
     'weight' => 0,
   );
 
-  // For the default local task, we need very little configuration, as the callback and other conditions are handled by the parent callback.
+  // For the default local task, we need very little configuration, as the
+  // callback and other conditions are handled by the parent callback.
   $items['admin/config/system/flag_notify/settings'] = array(
     'title' => 'Settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -249,7 +250,8 @@ function flag_notify_og_membership_insert(OgMembership $og_membership) {
   $groups[] = $group;
   // Fire notifications.
   flag_notify_main('new_user', $groups, NULL, NULL, $account);
-  // Flag user to follow the group activity it just joined if that's in its options.
+  // Flag user to follow the group activity it just joined if that's in its
+  // options.
   $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
   $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
   if ($user_default_options) {
@@ -282,7 +284,8 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
     $groups[] = $group;
     // Fire notifications.
     flag_notify_main('new_user', $groups, NULL, NULL, $account);
-    // Glag user to follow the group activity it just joined if that's in its options.
+    // Glag user to follow the group activity it just joined if that's in its
+    // options.
     $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
     $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
     if ($user_default_options) {
@@ -328,19 +331,24 @@ function flag_notify_og_membership_delete(OgMembership $og_membership) {
 
 
 /**
- * Pick up the targeted users of the notification and calls flag_notify_fire_email() with them.
+ * Pick up the targeted users of the notification.
+ * 
+ * This function selects the users to notify and calls flag_notify_fire_email()
+ * with them.
  *
- * @param $event
- *   Type of event issued, either 'new_comment', 'new_content', 'edited_content' or 'new_user'.
- * @param $groups
+ * @param string $event
+ *   Type of event issued, either 'new_comment', 'new_content',
+ *   'edited_content' or 'new_user'.
+ * @param array $groups
  *   Array of og groups to which the content belong to.
- * @param $node
+ * @param entity $node
  *   The content edited or with new comments.
- * @param $comment
+ * @param entity $comment
  *   The comment sent (if any).
- * @param $user
- *   The comment or content author (new comment/content), acting user (edited content) or the new og user.
- * @param $debug
+ * @param entity $user
+ *   The comment or content author (new comment/content), acting user (edited
+ *   content) or the new og user.
+ * @param bool $debug
  *   A bool option (default=FALSE) to print some debugging information.
  */
 function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALSE) {
@@ -443,14 +451,6 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
   foreach (array_keys($users_group) as $key) {
     flag_notify_fire_email($event, $users_group[$key], $node, $comment, $user, $key, 'group', $debug);
   }
-
-  /*
-  * Look these threads for possible HTML email sending in next versions of Flag Notify.
-  * https://api.drupal.org/api/drupal/includes!mail.inc/function/drupal_mail/7
-  * http://drupal.stackexchange.com/questions/54996/how-to-use-drupal-mail-to-send-emails-with-custom-template
-  * http://drupal.stackexchange.com/questions/28431/drupal-mail-in-html
-  * http://stackoverflow.com/questions/12528011/drupal-mail-html
-  */
 }
 
 /**
@@ -465,21 +465,23 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
  * - group - edited_content
  * - group - new_users
  *
- * @param $event
- *   Type of event issued, either 'new_comment', 'new_content', 'edited_content' or 'new_user'.
- * @param $group
+ * @param string $event
+ *   Type of event issued, either 'new_comment', 'new_content',
+ *   'edited_content' or 'new_user'.
+ * @param entity $group
  *   The og groups to which the content and the notified user belong to.
- * @param $node
+ * @param entity $node
  *   The content edited or with new comments.
- * @param $comment
+ * @param entity $comment
  *   The comment sent (if any).
- * @param $user
- *   The comment or content author (new comment/content), acting user (edited content) or the new og user.
- * @param $targetuser_uid
+ * @param entity $user
+ *   The comment or content author (new comment/content), acting user (edited
+ *   content) or the new og user.
+ * @param int $targetuser_uid
  *   The uid of the user to notify.
- * @param $notification_type
+ * @param string $notification_type
  *   The reason this user is notified, either 'comment', 'content' or 'group'.
- * @param $debug
+ * @param bool $debug
  *   A bool option (default=FALSE) to print some debugging information.
  */
 function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetuser_uid, $notification_type, $debug = FALSE) {
@@ -687,8 +689,10 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   $params['subject'] = $subject;
   $params['body'] = $msg;
 
-  // http://drupalcode.org/project/examples.git/blob_plain/refs/heads/7.x-1.x:/email_example/email_example.module
-  // $result = drupal_mail($module, $key, $to, $language, $params, $from, $send);
+  // http://drupalcode.org/project/examples.git/blob_plain/refs/heads/7.x-1.x:/
+  // email_example/email_example.module
+  // $result = drupal_mail($module, $key, $to, $language, $params, $from,
+  // $send);
   $result = drupal_mail('flag_notify', 'notification_email', $tuser->mail, $language, $params, $site_email, TRUE);
   if ($debug) {
     dpm("Result of the email sending action: ");
