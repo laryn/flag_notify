@@ -11,8 +11,9 @@
 module_load_include('inc', 'flag_notify', 'flag_notify_settings');
 
 /**
- * Valid permissions for this module
- * @return array An array of valid permissions for the test_module module
+ * Valid permissions for this module.
+ * @return array
+ *   An array of valid permissions for the test_module module
  */
 function flag_notify_permission() {
   return array(
@@ -24,27 +25,37 @@ function flag_notify_permission() {
 }
 
 /**
- * Display help and module information
+ * Display help and module information.
+ *
  * Implements hook_help().
- * @param path which path of the site we're displaying help
- * @param arg array that holds the current path as would be returned from arg() function
- * @return help text for the path
+ *
+ * @param $path 
+ *   Which path of the site we're displaying help.
+ * @param $arg
+ *   Array that holds the current path as would be returned from arg() function.
+ *
+ * @return
+ *   Help text for the path.
  */
 function flag_notify_help($path, $arg) {
   switch ($path) {
     case 'admin/help#flag_notify':
       $output = file_get_contents(drupal_get_path('module', 'flag_notify') . '/README.txt');
       return nl2br($output);
+
     case 'admin/config/system/flag_notify':
-      $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their name",array('@flag_module_url'=> url('admin/structure/flags'))) . '</p>';
-      return $output;          
-      break;
+      $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their name", array('@flag_module_url' => url('admin/structure/flags'))) . '</p>';
+      return $output;
+
+    break;
   }
 }
 
 /**
- * Menu for this module
- * @return array An array with this module's settings.
+ * Menu for this module.
+ *
+ * @return array
+ *   An array with this module's settings.
  */
 function flag_notify_menu() {
   $items = array();
@@ -55,15 +66,12 @@ function flag_notify_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_notify_admin'),
     'access arguments' => array('administer flag notify'),
-    //'type' => MENU_NORMAL_ITEM,  // Not necessary since this is the default.
     'weight' => 0,
   );
 
   // For the default local task, we need very little configuration, as the callback and other conditions are handled by the parent callback.
   $items['admin/config/system/flag_notify/settings'] = array(
     'title' => 'Settings',
-
-    //'description' => 'General settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
   );
@@ -90,9 +98,8 @@ function flag_notify_perms() {
 
 
 // ****************** logic of the module starts here *************************
-
 /**
- * Implements hook_comment_publish($comment).
+ * Implements hook_comment_publish().
  */
 function flag_notify_comment_publish($comment) {
   $use_default_events = variable_get('flag_notify_use_default_events', '1');
@@ -106,28 +113,32 @@ function flag_notify_comment_publish($comment) {
   if (module_exists('og')) {
     $group_ids = og_get_entity_groups('node', $node);
   }
-  if (isset($group_ids['node'])) { // getting only node groups
+  if (isset($group_ids['node'])) {
+    // Getting only node groups.
     foreach ($group_ids['node'] as $group_id) {
       $group = node_load($group_id);
       $groups[] = $group;
     }
   }
-  flag_notify_main('new_comment', $groups, $node, $comment, $user); // fire notification
+  // Fire notification.
+  flag_notify_main('new_comment', $groups, $node, $comment, $user);
 
-  // flag user to follow its own comment if that's in its options
+  // Flag user to follow its own comment if that's in its options.
   $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
   $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '0');
-  foreach ($user_default_options as $option) {
-    if ($option['value'] == 'comment' && $flag_notify_flag_comment_mname) {
-      $flag = flag_get_flag($flag_notify_flag_comment_mname);
-      $flag->flag('flag', $comment->cid, $user);
-      break;
+  if ($user_default_options) {
+    foreach ($user_default_options as $option) {
+      if ($option['value'] == 'comment' && $flag_notify_flag_comment_mname) {
+        $flag = flag_get_flag($flag_notify_flag_comment_mname);
+        $flag->flag('flag', $comment->cid, $user);
+        break;
+      }
     }
   }
 }
 
 /**
- * Implements hook_node_insert($node).
+ * Implements hook_node_insert().
  */
 function flag_notify_node_insert($node) {
   $use_default_events = variable_get('flag_notify_use_default_events', '1');
@@ -140,29 +151,33 @@ function flag_notify_node_insert($node) {
     if (module_exists('og')) {
       $group_ids = og_get_entity_groups('node', $node);
     }
-    if (isset($group_ids['node'])) { // getting only node groups
+    if (isset($group_ids['node'])) {
+      // Getting only node groups.
       foreach ($group_ids['node'] as $group_id) {
         $group = node_load($group_id);
         $groups[] = $group;
       }
     }
-    flag_notify_main('new_content', $groups, $node, NULL, $user); // fire notification
+    // Fire notification.
+    flag_notify_main('new_content', $groups, $node, NULL, $user);
 
-    // flag user to follow its own node if that's in its options
+    // Flag user to follow its own node if that's in its options.
     $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
     $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
-    foreach ($user_default_options as $option) {
-      if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
-        $flag = flag_get_flag($flag_notify_flag_content_mname);
-        $flag->flag('flag', $node->nid, $user);
-        break;
+    if ($user_default_options) {
+      foreach ($user_default_options as $option) {
+        if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
+          $flag = flag_get_flag($flag_notify_flag_content_mname);
+          $flag->flag('flag', $node->nid, $user);
+          break;
+        }
       }
     }
   }
 }
 
 /**
- * Implements hook_node_update($node).
+ * Implements hook_node_update().
  */
 function flag_notify_node_update($node) {
   $use_default_events = variable_get('flag_notify_use_default_events', '1');
@@ -176,38 +191,43 @@ function flag_notify_node_update($node) {
     if (module_exists('og')) {
       $group_ids = og_get_entity_groups('node', $node);
     }
-    if (isset($group_ids['node'])) { // getting only node groups
+    if (isset($group_ids['node'])) {
+      // Getting only node groups.
       foreach ($group_ids['node'] as $group_id) {
         $group = node_load($group_id);
         $groups[] = $group;
       }
     }
     if ($old_node->status == 0) {
-      // I treat this as an insert
+      // I treat this as an insert.
       $user = user_load($node->uid);
-      flag_notify_main('new_content', $groups, $node, NULL, $user); // fire notifications
+      // Fire notifications.
+      flag_notify_main('new_content', $groups, $node, NULL, $user);
 
-      // flag user to follow its own node if that's in its options
+      // Flag user to follow its own node if that's in its options.
       $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
       $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
-      foreach ($user_default_options as $option) {
-        if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
-          $flag = flag_get_flag($flag_notify_flag_content_mname);
-          $flag->flag('flag', $node->nid, $user);
-          break;
+      if ($user_default_options) {
+        foreach ($user_default_options as $option) {
+          if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
+            $flag = flag_get_flag($flag_notify_flag_content_mname);
+            $flag->flag('flag', $node->nid, $user);
+            break;
+          }
         }
       }
     }
     else {
-      // Definitivelly an update
+      // Definitivelly an update.
       $account = $GLOBALS['user'];
-      flag_notify_main('edited_content', $groups, $node, NULL, $account); // fire notifications
+      // Fire notifications.
+      flag_notify_main('edited_content', $groups, $node, NULL, $account);
     }
   }
 }
 
 /**
- * Implements hook_og_membership_insert(OgMembership $og_membership).
+ * Implements hook_og_membership_insert().
  */
 function flag_notify_og_membership_insert(OgMembership $og_membership) {
   $use_default_events = variable_get('flag_notify_use_default_events', '1');
@@ -216,48 +236,23 @@ function flag_notify_og_membership_insert(OgMembership $og_membership) {
   }
 
   if ($og_membership->entity_type != 'user') {
-    return; // we want deal only with new users here, no content attached to a group
+    // We want deal only with new users here, no content attached to a group.
+    return;
   }
   if ($og_membership->state != '1') {
-    return; // this new user still need approval, doing nothing
+    // This new user still need approval, doing nothing.
+    return;
   }
   $groups = array();
   $account = user_load($og_membership->etid);
   $group = node_load($og_membership->gid);
   $groups[] = $group;
-  flag_notify_main('new_user', $groups, NULL, NULL, $account); // fire notifications
-  // flag user to follow the group activity it just joined if that's in its options
+  // Fire notifications.
+  flag_notify_main('new_user', $groups, NULL, NULL, $account);
+  // Flag user to follow the group activity it just joined if that's in its options.
   $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
   $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
-  foreach ($user_default_options as $option) {
-    if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
-      $flag = flag_get_flag($flag_notify_flag_group_mname);
-      $flag->flag('flag', $group->nid, $account);
-      break;
-    }
-  }
-}
-
-/**
- * Implements hook_og_membership_update(OgMembership $og_membership).
- */
-function flag_notify_og_membership_update(OgMembership $og_membership) {
-  $use_default_events = variable_get('flag_notify_use_default_events', '1');
-  if ($og_membership->entity_type != 'user') {
-    return; // we want deal only with new users here, no content attached to a group
-  }
-
-  $old_membership = $og_membership->original;
-  if ($old_membership->state != "1" && $og_membership->state == "1" && $use_default_events) { // it's an approval
-    $groups = array();
-    $account = user_load($og_membership->etid);
-    $group = node_load($og_membership->gid);
-    $groups[] = $group;
-    //dpm('fired');
-    flag_notify_main('new_user', $groups, NULL, NULL, $account); // fire notifications
-    // flag user to follow the group activity it just joined if that's in its options
-    $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
-    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
+  if ($user_default_options) {
     foreach ($user_default_options as $option) {
       if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
         $flag = flag_get_flag($flag_notify_flag_group_mname);
@@ -266,8 +261,43 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
       }
     }
   }
-  elseif ($old_membership->state == "1" && $og_membership->state != "1") { // it's banned/bloccked, let's remove also notifications
-    // TODO: remove notification only for private groups
+}
+
+/**
+ * Implements hook_og_membership_update().
+ */
+function flag_notify_og_membership_update(OgMembership $og_membership) {
+  $use_default_events = variable_get('flag_notify_use_default_events', '1');
+  if ($og_membership->entity_type != 'user') {
+    // We want deal only with new users here, no content attached to a group.
+    return;
+  }
+
+  $old_membership = $og_membership->original;
+  if ($old_membership->state != "1" && $og_membership->state == "1" && $use_default_events) {
+    // It's an approval.
+    $groups = array();
+    $account = user_load($og_membership->etid);
+    $group = node_load($og_membership->gid);
+    $groups[] = $group;
+    // Fire notifications.
+    flag_notify_main('new_user', $groups, NULL, NULL, $account);
+    // Glag user to follow the group activity it just joined if that's in its options.
+    $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
+    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
+    if ($user_default_options) {
+      foreach ($user_default_options as $option) {
+        if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
+          $flag = flag_get_flag($flag_notify_flag_group_mname);
+          $flag->flag('flag', $group->nid, $account);
+          break;
+        }
+      }
+    }
+  }
+  elseif ($old_membership->state == "1" && $og_membership->state != "1") {
+    // It's banned/bloccked, let's remove also notifications.
+    // TODO: remove notification only for private groups.
     $account = user_load($og_membership->etid);
     $group = node_load($og_membership->gid);
     $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
@@ -279,13 +309,14 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
 }
 
 /**
- * Implements hook_og_membership_delete(OgMembership $og_membership).
+ * Implements hook_og_membership_delete().
  */
 function flag_notify_og_membership_delete(OgMembership $og_membership) {
   if ($og_membership->entity_type != 'user') {
-    return; // we want deal only with new users here, no content attached to a group
+    // We want deal only with new users here, no content attached to a group.
+    return;
   }
-  // TODO: remove notification only for private groups
+  // TODO: remove notification only for private groups.
   $account = user_load($og_membership->etid);
   $group = node_load($og_membership->gid);
   $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
@@ -297,16 +328,24 @@ function flag_notify_og_membership_delete(OgMembership $og_membership) {
 
 
 /**
- * Pick up the targeted users of the notification and calls flag_notify_fire_email() with them
- * @param event type of event issued, either 'new_comment', 'new_content', 'edited_content' or 'new_user'
- * @param groups array of og groups to which the content belong to
- * @param node the content edited or with new comments
- * @param user the comment or content author (new comment/content), acting user (edited content) or the new og user
- * @param debug a bool option (default=FALSE) to print some debugging information
+ * Pick up the targeted users of the notification and calls flag_notify_fire_email() with them.
+ *
+ * @param $event
+ *   Type of event issued, either 'new_comment', 'new_content', 'edited_content' or 'new_user'.
+ * @param $groups
+ *   Array of og groups to which the content belong to.
+ * @param $node
+ *   The content edited or with new comments.
+ * @param $comment
+ *   The comment sent (if any).
+ * @param $user
+ *   The comment or content author (new comment/content), acting user (edited content) or the new og user.
+ * @param $debug
+ *   A bool option (default=FALSE) to print some debugging information.
  */
 function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALSE) {
   if ($debug) {
-    drupal_set_message("Flag notify module: flag_notify_main has been called with debugging information turned ON.", 'status');
+    drupal_set_message(t("Flag notify module: flag_notify_main has been called with debugging information turned ON."), 'status');
     dpm("** Debugging flag_notify_main **");
     dpm("event: ");
     dpm($event);
@@ -320,7 +359,7 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
     dpm($user);
   }
 
-  //Lists of uids that will be notified..
+  // Lists of uids that will be notified..
   $users_comment = array();
   $users_content = array();
   $users_group = array();
@@ -329,18 +368,21 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
   $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
   $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
 
-  //Checking who has flagged the parent comments for reply notification..
+  // Checking who has flagged the parent comments for reply notification..
   if ($flag_notify_flag_comment_mname && $event == 'new_comment') {
-    $fullthread = $comment->thread;
     $threads = explode('.', $comment->thread);
     $thread = "";
     $pnids = array();
-    for ($i = 0; $i < (count($threads) -1); $i++) {
+    for ($i = 0; $i < (count($threads) - 1); $i++) {
       $thread .= $threads[$i];
       $local_thread = $thread . "/";
       $result = db_query(
         'SELECT c.cid FROM {comment} c WHERE c.nid = :nid AND c.thread = :thread AND c.status = :status',
-        array(':nid' => $comment->nid, ':thread' => $local_thread, ':status' => '1')
+        array(
+          ':nid' => $comment->nid,
+          ':thread' => $local_thread,
+          ':status' => '1',
+        )
       );
       foreach ($result as $record) {
         $pnids[] = $record->cid;
@@ -350,33 +392,34 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
     foreach ($pnids as $pnid) {
       $users_comment_data = flag_get_entity_flags('comment', $pnid, $flag_notify_flag_comment_mname);
       foreach ($users_comment_data as $user_comment_data) {
-        if (! array_key_exists($user_comment_data->uid, $users_comment)) {
+        if (!array_key_exists($user_comment_data->uid, $users_comment)) {
           $users_comment[$user_comment_data->uid] = $user_comment_data->uid;
         }
       }
     }
   }
 
-  //Checking who has flagged the node for comment/edit notification..
+  // Checking who has flagged the node for comment/edit notification..
   if ($flag_notify_flag_content_mname && $event != 'new_user') {
     $users_content_data = flag_get_entity_flags('node', $node->nid, $flag_notify_flag_content_mname);
     foreach ($users_content_data as $user_content_data) {
-      if ((! array_key_exists($user_content_data->uid, $users_comment)) &&
-          (! array_key_exists($user_content_data->uid, $users_content))) {
+      if ((!array_key_exists($user_content_data->uid, $users_comment)) &&
+          (!array_key_exists($user_content_data->uid, $users_content))) {
         $users_content[$user_content_data->uid] = $user_content_data->uid;
       }
     }
   }
 
-  //Checking who has flagged the og group for activities notifications..
+  // Checking who has flagged the og group for activities notifications..
   if ($flag_notify_flag_group_mname) {
     foreach ($groups as $group) {
       $users_group_data = flag_get_entity_flags('node', $group->nid, $flag_notify_flag_group_mname);
       foreach ($users_group_data as $user_group_data) {
-        if ((! array_key_exists($user_group_data->uid, $users_comment)) &&
-            (! array_key_exists($user_group_data->uid, $users_content)) &&
-            (! array_key_exists($user_group_data->uid, $users_group))) {
-          $users_group[$user_group_data->uid] = $group; //here we need also the group information for the email
+        if ((!array_key_exists($user_group_data->uid, $users_comment)) &&
+            (!array_key_exists($user_group_data->uid, $users_content)) &&
+            (!array_key_exists($user_group_data->uid, $users_group))) {
+          // Here we need also the group information for the email.
+          $users_group[$user_group_data->uid] = $group;
         }
       }
     }
@@ -402,22 +445,42 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
   }
 
   /*
-  https://api.drupal.org/api/drupal/includes!mail.inc/function/drupal_mail/7
-  http://drupal.stackexchange.com/questions/54996/how-to-use-drupal-mail-to-send-emails-with-custom-template
-  http://drupal.stackexchange.com/questions/28431/drupal-mail-in-html
-  http://stackoverflow.com/questions/12528011/drupal-mail-html
+  * Look these threads for possible HTML email sending in next versions of Flag Notify.
+  * https://api.drupal.org/api/drupal/includes!mail.inc/function/drupal_mail/7
+  * http://drupal.stackexchange.com/questions/54996/how-to-use-drupal-mail-to-send-emails-with-custom-template
+  * http://drupal.stackexchange.com/questions/28431/drupal-mail-in-html
+  * http://stackoverflow.com/questions/12528011/drupal-mail-html
   */
 }
 
 /**
- * Implements the logic
- * @param event type of event issued, either 'new_comment', 'new_content', 'edited_content' or 'new_user'
- * @param group the og groups to which the content and the notified user belong to
- * @param node the content edited or with new comments
- * @param user the comment or content author (new comment/content), acting user (edited content) or the new og user
- * @param targetuser_uid the uid of the user to notify
- * @param notification_type the reason this user is notified, either 'comment', 'content' or 'group'
- * @param debug a bool option (default=FALSE) to print some debugging information
+ * Implements the logic.
+ *
+ * Possible [notification-type] / [event-type] matches:
+ * - comment - new_comment
+ * - content - new_content
+ * - content - edited_content
+ * - group - new_comment
+ * - group - new_content
+ * - group - edited_content
+ * - group - new_users
+ *
+ * @param $event
+ *   Type of event issued, either 'new_comment', 'new_content', 'edited_content' or 'new_user'.
+ * @param $group
+ *   The og groups to which the content and the notified user belong to.
+ * @param $node
+ *   The content edited or with new comments.
+ * @param $comment
+ *   The comment sent (if any).
+ * @param $user
+ *   The comment or content author (new comment/content), acting user (edited content) or the new og user.
+ * @param $targetuser_uid
+ *   The uid of the user to notify.
+ * @param $notification_type
+ *   The reason this user is notified, either 'comment', 'content' or 'group'.
+ * @param $debug
+ *   A bool option (default=FALSE) to print some debugging information.
  */
 function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetuser_uid, $notification_type, $debug = FALSE) {
   if ($debug) {
@@ -449,19 +512,9 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   $language = user_preferred_language($tuser);
   $acting_user = $GLOBALS['user'];
   if ($acting_user->uid == $tuser->uid) {
-    return; // no need to send notification to the acting user!
+    // No need to send notification to the acting user!
+    return;
   }
-
-  /**
-   * Possible [notification-type] / [event-type] matches:
-   * - comment - new_comment
-   * - content - new_content
-   * - content - edited_content
-   * - group - new_comment
-   * - group - new_content
-   * - group - edited_content
-   * - group - new_users
-   */
 
   $subject = "[" . $site_name . "] ";
   $msg = "";
@@ -535,7 +588,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     $msg .= t("Browse !user_name profile", array('!user_name' => $user->name)) . ": " . $base_url . "/user/" . $user->uid . "\n";
     $msg .= "-----------------\n";
     $msg .= "*** " . t('MANAGE NOTIFICATIONS') . " ***\n";
-    $msg .= t("Comments and modifications of this content") . ": " . 
+    $msg .= t("Comments and modifications of this content") . ": " .
       t('click the "!unflag_text" link on the content', array('!unflag_text' => $unflag_text)) . "\n";
 
   }
