@@ -10,31 +10,40 @@
  */
 function flag_notify_admin($form, &$form_state) {
 
-  $form['flag_notify_flag_group_mname'] = array(
-    '#type' => 'textfield',
-    '#title' => t('The machine name of the flag to be notified of group activity'),
-    '#default_value' => variable_get('flag_notify_flag_group_mname', ''),
-    '#size' => 20,
-    '#maxlength' => 255,
-    '#description' => t('In the flag module create a "Receive notifications of this group\'s activity" flag and write here its machine name.'),
+
+  $flags_comment_objs = flag_get_flags('comment');
+  $flags_content_objs = flag_get_flags('node');
+  $flags_comment = array('0' => 'None');
+  $flags_content = array('0' => 'None');
+  
+  foreach ($flags_comment_objs as $flags_comment_obj){
+    $flags_comment[$flags_comment_obj->name] = $flags_comment_obj->title;
+  }
+  foreach ($flags_content_objs as $flags_content_obj){
+    $flags_content[$flags_content_obj->name] = $flags_content_obj->title;
+  }
+  $form['flag_notify_flag_comment_mname'] = array(
+    '#type' => 'select',
+    '#title' => t('Comment Notification Flag'),
+    '#default_value' => variable_get('flag_notify_flag_comment_mname', '0'),
+    '#description' => t('Choose the flag to be used to keep notification of comments follow-ups.'),
+    '#options' => $flags_comment,
     '#required' => FALSE,
   );
   $form['flag_notify_flag_content_mname'] = array(
-    '#type' => 'textfield',
-    '#title' => t('The machine name of the flag to be notified of activity related to this content'),
-    '#default_value' => variable_get('flag_notify_flag_content_mname', ''),
-    '#size' => 20,
-    '#maxlength' => 255,
-    '#description' => t('In the flag module create a "Receive notifications of this content\'s activity" flag and write here its machine name.'),
+    '#type' => 'select',
+    '#title' => t('Content Notification Flag'),
+    '#default_value' => variable_get('flag_notify_flag_content_mname', '0'),
+    '#options' => $flags_content,  
+    '#description' => t('Choose the flag to be used to keep notification of comments and modification of a given content.'),
     '#required' => FALSE,
-  );
-  $form['flag_notify_flag_comment_mname'] = array(
-    '#type' => 'textfield',
-    '#title' => t('The machine name of the flag to be notified of replied to this comment.'),
-    '#default_value' => variable_get('flag_notify_flag_comment_mname', ''),
-    '#size' => 20,
-    '#maxlength' => 255,
-    '#description' => t('In the flag module create a "Receive notifications of replies to this comment" flag and write here its machine name.'),
+  ); 
+  $form['flag_notify_flag_group_mname'] = array(
+    '#type' => 'select',
+    '#title' => t('Group Notification Flag.'),
+    '#default_value' => variable_get('flag_notify_flag_group_mname', ''),
+    '#options' => $flags_content,  
+    '#description' => t('Choose the flag to be used to keep notification of group activity.'),
     '#required' => FALSE,
   );
   $form['flag_notify_url_manage_notifications'] = array(

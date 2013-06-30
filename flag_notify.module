@@ -31,9 +31,14 @@ function flag_notify_permission() {
  * @return help text for the path
  */
 function flag_notify_help($path, $arg) {
-  if ($path == 'admin/help#flag_notify') {
-    $output = file_get_contents(drupal_get_path('module', 'flag_notify') . '/README.txt');
-    return nl2br($output);
+  switch ($path) {
+    case 'admin/help#flag_notify':
+      $output = file_get_contents(drupal_get_path('module', 'flag_notify') . '/README.txt');
+      return nl2br($output);
+    case 'admin/config/system/flag_notify':
+      $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their name",array('@flag_module_url'=> url('admin/structure/flags'))) . '</p>';
+      return $output;          
+      break;
   }
 }
 
@@ -111,7 +116,7 @@ function flag_notify_comment_publish($comment) {
 
   // flag user to follow its own comment if that's in its options
   $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
-  $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '');
+  $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '0');
   foreach ($user_default_options as $option) {
     if ($option['value'] == 'comment' && $flag_notify_flag_comment_mname) {
       $flag = flag_get_flag($flag_notify_flag_comment_mname);
@@ -145,7 +150,7 @@ function flag_notify_node_insert($node) {
 
     // flag user to follow its own node if that's in its options
     $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
-    $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '');
+    $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
     foreach ($user_default_options as $option) {
       if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
         $flag = flag_get_flag($flag_notify_flag_content_mname);
@@ -184,7 +189,7 @@ function flag_notify_node_update($node) {
 
       // flag user to follow its own node if that's in its options
       $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
-      $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '');
+      $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
       foreach ($user_default_options as $option) {
         if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
           $flag = flag_get_flag($flag_notify_flag_content_mname);
@@ -223,7 +228,7 @@ function flag_notify_og_membership_insert(OgMembership $og_membership) {
   flag_notify_main('new_user', $groups, NULL, NULL, $account); // fire notifications
   // flag user to follow the group activity it just joined if that's in its options
   $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
-  $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '');
+  $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
   foreach ($user_default_options as $option) {
     if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
       $flag = flag_get_flag($flag_notify_flag_group_mname);
@@ -252,7 +257,7 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
     flag_notify_main('new_user', $groups, NULL, NULL, $account); // fire notifications
     // flag user to follow the group activity it just joined if that's in its options
     $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
-    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '');
+    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
     foreach ($user_default_options as $option) {
       if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
         $flag = flag_get_flag($flag_notify_flag_group_mname);
@@ -265,7 +270,7 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
     // TODO: remove notification only for private groups
     $account = user_load($og_membership->etid);
     $group = node_load($og_membership->gid);
-    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '');
+    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
     if ($flag_notify_flag_group_mname) {
       $flag = flag_get_flag($flag_notify_flag_group_mname);
       $flag->flag('unflag', $group->nid, $account);
@@ -283,7 +288,7 @@ function flag_notify_og_membership_delete(OgMembership $og_membership) {
   // TODO: remove notification only for private groups
   $account = user_load($og_membership->etid);
   $group = node_load($og_membership->gid);
-  $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '');
+  $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
   if ($flag_notify_flag_group_mname) {
     $flag = flag_get_flag($flag_notify_flag_group_mname);
     $flag->flag('unflag', $group->nid, $account);
@@ -320,9 +325,9 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
   $users_content = array();
   $users_group = array();
 
-  $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '');
-  $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '');
-  $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '');
+  $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '0');
+  $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
+  $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
 
   //Checking who has flagged the parent comments for reply notification..
   if ($flag_notify_flag_comment_mname && $event == 'new_comment') {
@@ -463,7 +468,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
   if ($notification_type == 'comment') {
 
-    $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '');
+    $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '0');
     $flag = flag_get_flag($flag_notify_flag_comment_mname);
     $unflag_text = $flag->unflag_short;
     $cbody_field = field_get_items('comment', $comment, 'comment_body');
@@ -488,7 +493,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
   }
   elseif ($notification_type == 'content') {
-    $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '');
+    $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
     $flag = flag_get_flag($flag_notify_flag_content_mname);
     $unflag_text = $flag->unflag_short;
 
@@ -536,7 +541,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   }
   elseif ($notification_type == 'group') {
 
-    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '');
+    $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
     $flag = flag_get_flag($flag_notify_flag_group_mname);
     $unflag_text = $flag->unflag_short;
     $subject .= "[" . $group->title . "] ";
