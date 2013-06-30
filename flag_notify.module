@@ -46,8 +46,6 @@ function flag_notify_help($path, $arg) {
     case 'admin/config/system/flag_notify':
       $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their name", array('@flag_module_url' => url('admin/structure/flags'))) . '</p>';
       return $output;
-
-    break;
   }
 }
 
