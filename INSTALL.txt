@@ -19,9 +19,6 @@ Views + View bulk operation
 to receive notification and remove them
 -> an easy-to-be imported export view will be provided
 
-Field Permissions
--> to make private the user default notification option field
-
 ** INSTALLATION INSTRUCTIIONS **
 
 1) Download and enable the og module before Flag Notify if you want to use
@@ -31,7 +28,7 @@ group notification
 to this content") on admin/structure/flags.
 Any of these three levels is optional.
 4) Configure Flag Notify under admin/config/system/flag_notify
-5) Optionally create a view (e.g. with View Bulk Operation) to allow users to
+5) Optionally create a view (suggested using View Bulk Operation) to allow users to
 manage their notification
 
 ** Troubles **

@@ -10,7 +10,7 @@
  */
 function flag_notify_install() {
   $t = get_t();
-  $default_notification_field_name = "field_notification_defaults";
+  $default_notification_field_name = "flag_notify_field_defaults";
   if (!field_info_field($default_notification_field_name)) {
     // Check if the field already exists.
     $description = $t('Select the ​​default notification options for the contents you create and the replies to your comments. These default options can then be modified on a content or comment base.');
@@ -68,7 +68,7 @@ function flag_notify_uninstall() {
 
   db_delete('variable')->where('name', "flag_notify_%", 'LIKE');
 
-  $default_notification_field_name = "field_notification_defaults";
+  $default_notification_field_name = "flag_notify_field_defaults";
   $field_instance = array(
     'field_name' => $default_notification_field_name,
     'entity_type' => 'user',

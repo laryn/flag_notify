@@ -44,7 +44,7 @@ function flag_notify_help($path, $arg) {
       return nl2br($output);
 
     case 'admin/config/system/flag_notify':
-      $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their name", array('@flag_module_url' => url('admin/structure/flags'))) . '</p>';
+      $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their names", array('@flag_module_url' => url('admin/structure/flags'))) . '</p>';
       return $output;
   }
 }
@@ -95,6 +95,20 @@ function flag_notify_perms() {
   drupal_goto('admin/people/permissions', array('fragment' => 'module-flag_notify'));
 }
 
+/**
+ * Implements hook_field_access().
+ */
+function flag_notify_field_access($op, $field, $entity_type, $entity, $account) {
+  if ($field['field_name'] == 'flag_notify_field_defaults' && $op == 'view' ) {
+   if ($entity->uid == $account->uid) {
+      // View only own values for this field.
+      return TRUE;
+    }
+    return FALSE;
+  }  
+  return TRUE;
+}
+
 
 // ****************** logic of the module starts here *************************
 /**
@@ -123,7 +137,7 @@ function flag_notify_comment_publish($comment) {
   flag_notify_main('new_comment', $groups, $node, $comment, $user);
 
   // Flag user to follow its own comment if that's in its options.
-  $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
+  $user_default_options = field_get_items('user', $user, 'flag_notify_field_defaults');
   $flag_notify_flag_comment_mname = variable_get('flag_notify_flag_comment_mname', '0');
   if ($user_default_options) {
     foreach ($user_default_options as $option) {
@@ -161,7 +175,7 @@ function flag_notify_node_insert($node) {
     flag_notify_main('new_content', $groups, $node, NULL, $user);
 
     // Flag user to follow its own node if that's in its options.
-    $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
+    $user_default_options = field_get_items('user', $user, 'flag_notify_field_defaults');
     $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
     if ($user_default_options) {
       foreach ($user_default_options as $option) {
@@ -204,7 +218,7 @@ function flag_notify_node_update($node) {
       flag_notify_main('new_content', $groups, $node, NULL, $user);
 
       // Flag user to follow its own node if that's in its options.
-      $user_default_options = field_get_items('user', $user, 'field_notification_defaults');
+      $user_default_options = field_get_items('user', $user, 'flag_notify_field_defaults');
       $flag_notify_flag_content_mname = variable_get('flag_notify_flag_content_mname', '0');
       if ($user_default_options) {
         foreach ($user_default_options as $option) {
@@ -250,7 +264,7 @@ function flag_notify_og_membership_insert(OgMembership $og_membership) {
   flag_notify_main('new_user', $groups, NULL, NULL, $account);
   // Flag user to follow the group activity it just joined if that's in its
   // options.
-  $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
+  $user_default_options = field_get_items('user', $account, 'flag_notify_field_defaults');
   $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
   if ($user_default_options) {
     foreach ($user_default_options as $option) {
@@ -284,7 +298,7 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
     flag_notify_main('new_user', $groups, NULL, NULL, $account);
     // Glag user to follow the group activity it just joined if that's in its
     // options.
-    $user_default_options = field_get_items('user', $account, 'field_notification_defaults');
+    $user_default_options = field_get_items('user', $account, 'flag_notify_field_defaults');
     $flag_notify_flag_group_mname = variable_get('flag_notify_flag_group_mname', '0');
     if ($user_default_options) {
       foreach ($user_default_options as $option) {
@@ -529,7 +543,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     if (isset($cbody_field)) {
       $cbody = $cbody_field[0]['value'];
     }
-    $subject .= t('New comment reply.');
+    $subject .= t('New comment reply:') . ' ' . $comment->subject;
     $msg .= t("!salutation !tuser_name, a comment you subscribed received a reply:\n\n",
       array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
     $msg .= t("Title") . ": " . $comment->subject . "\n";
@@ -557,7 +571,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
         $cbody = $cbody_field[0]['value'];
       }
 
-      $subject .= t('Notification of new comment on a content you are following.');
+      $subject .= t('New comment:') . ' ' . $comment->subject;
       $msg .= t("!salutation !tuser_name, a comment has been sent in a content you subscribed:\n\n",
         array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
       $msg .= t("Comment title") . ": " . $comment->subject . "\n";
@@ -570,7 +584,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
     }
     elseif ($event == 'edited_content') {
-      $subject .= t('Notification of content modified.');
+      $subject .= t('Content modified:') . ' ' . $node->title;
       $msg .= t("!salutation !tuser_name, a content you are subscribed has been edited:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
       $msg .= t("Title") . ": " . $node->title . "\n";
       $msg .= t("Type") . ": " . $node->type . "\n";
