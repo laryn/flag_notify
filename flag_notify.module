@@ -99,13 +99,13 @@ function flag_notify_perms() {
  * Implements hook_field_access().
  */
 function flag_notify_field_access($op, $field, $entity_type, $entity, $account) {
-  if ($field['field_name'] == 'flag_notify_field_defaults' && $op == 'view' ) {
-   if ($entity->uid == $account->uid) {
+  if ($field['field_name'] == 'flag_notify_field_defaults' && $op == 'view') {
+    if ($entity->uid == $account->uid) {
       // View only own values for this field.
       return TRUE;
     }
     return FALSE;
-  }  
+  }
   return TRUE;
 }
 

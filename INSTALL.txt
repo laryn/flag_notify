@@ -28,8 +28,8 @@ group notification
 to this content") on admin/structure/flags.
 Any of these three levels is optional.
 4) Configure Flag Notify under admin/config/system/flag_notify
-5) Optionally create a view (suggested using View Bulk Operation) to allow users to
-manage their notification
+5) Optionally create a view (suggested using View Bulk Operation) to allow
+users to manage their notification.
 
 ** Troubles **
 1) If you install the og module AFTER having installed this module and you want
