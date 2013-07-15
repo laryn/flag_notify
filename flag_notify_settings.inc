@@ -23,26 +23,26 @@ function flag_notify_admin($form, &$form_state) {
   }
   $form['flag_notify_flag_comment_mname'] = array(
     '#type' => 'select',
-    '#title' => t('Comment Notification Flag'),
+    '#title' => t('Comment Subscription Flag'),
     '#default_value' => variable_get('flag_notify_flag_comment_mname', '0'),
-    '#description' => t('Choose the flag to be used to keep notification of comments follow-ups.'),
+    '#description' => t('Choose the flag to use for comments follow-up notification.'),
     '#options' => $flags_comment,
     '#required' => FALSE,
   );
   $form['flag_notify_flag_content_mname'] = array(
     '#type' => 'select',
-    '#title' => t('Content Notification Flag'),
+    '#title' => t('Content Subscription Flag'),
     '#default_value' => variable_get('flag_notify_flag_content_mname', '0'),
     '#options' => $flags_content,
-    '#description' => t('Choose the flag to be used to keep notification of comments and modification of a given content.'),
+    '#description' => t('Choose the flag to use for notification of comments and edits in a given content.'),
     '#required' => FALSE,
   );
   $form['flag_notify_flag_group_mname'] = array(
     '#type' => 'select',
-    '#title' => t('Group Notification Flag.'),
+    '#title' => t('Group Subscription Flag.'),
     '#default_value' => variable_get('flag_notify_flag_group_mname', ''),
     '#options' => $flags_content,
-    '#description' => t('Choose the flag to be used to keep notification of group activity.'),
+    '#description' => t('Choose the flag to use for group activity notification.'),
     '#required' => FALSE,
   );
   $form['flag_notify_url_manage_notifications'] = array(
@@ -51,7 +51,7 @@ function flag_notify_admin($form, &$form_state) {
     '#default_value' => variable_get('flag_notify_url_manage_notifications', ''),
     '#size' => 80,
     '#maxlength' => 255,
-    '#description' => t('A relative URL (if any) where you allow users to manage their subscriptions, typically using a view. If provided, a text like "manage your notifications" will be added at the end of each sent email. Please provide a URL relative to drupal root, starting without "/".'),
+    '#description' => t('A relative URL (if any) where you allow users to manage their subscriptions, typically using a view. If provided, a text like "manage your notifications" will be added at the end of each sent email. Please provide a URL relative to the Drupal root, starting without "/".'),
     '#required' => FALSE,
   );
   $form['flag_notify_email_salutation'] = array(
@@ -60,7 +60,7 @@ function flag_notify_admin($form, &$form_state) {
     '#default_value' => variable_get('flag_notify_email_salutation', t('Dear')),
     '#size' => 80,
     '#maxlength' => 255,
-    '#description' => t('How to address your users?'),
+    '#description' => t('How to address your users ?'),
     '#required' => FALSE,
   );
   $form['flag_notify_email_footer'] = array(
@@ -69,7 +69,7 @@ function flag_notify_admin($form, &$form_state) {
     '#default_value' => variable_get('flag_notify_email_footer', ''),
     '#size' => 80,
     '#maxlength' => 255,
-    '#description' => t("An optional email footer. Sorry plain test, don't include HTML markup"),
+    '#description' => t("An optional email footer. Basic HTML mark-up will be converted in text equivalent."),
     '#required' => FALSE,
   );
   $use_default_events = array(
@@ -80,7 +80,7 @@ function flag_notify_admin($form, &$form_state) {
     '#type' => 'select',
     '#title' => t('Use default events'),
     '#default_value' => variable_get('flag_notify_use_default_events', '1'),
-    '#description' => t('Flag Notify already comes with its own event handler (node comment, node edit..). If you prefer instead to call directly <em>node_flag_main()</em>, e.g. using rules, change this option to <em>FALSE</em>'),
+    '#description' => t('Flag Notify already comes with its own event handler (new comment, node edit..). If you prefer instead to call directly <em>node_flag_main()</em>, e.g. using rules, change this option to <em>FALSE</em>'),
     '#options' => $use_default_events,
     '#required' => TRUE,
   );

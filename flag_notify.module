@@ -19,7 +19,7 @@ function flag_notify_permission() {
   return array(
     'administer flag notify' => array(
       'title' => t('Administer Flag Notify'),
-      'description' => t('Set roles that may access the settings of Flag Notify.'),
+      'description' => t('Set roles that may access the Flag Notify settings.'),
     ),
   );
 }
@@ -543,7 +543,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     if (isset($cbody_field)) {
       $cbody = $cbody_field[0]['value'];
     }
-    $subject .= t('New comment reply:') . ' ' . $comment->subject;
+    $subject .= t('Comment follow-up:') . ' ' . $comment->subject;
     $msg .= t("!salutation !tuser_name, a comment you subscribed received a reply:\n\n",
       array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
     $msg .= t("Title") . ": " . $comment->subject . "\n";
@@ -619,7 +619,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
         $cbody = $cbody_field[0]['value'];
       }
       $subject .= t('New comment');
-      $msg .= t("!salutation !tuser_name, a comment has been sent in a group you subscribed:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
+      $msg .= t("!salutation !tuser_name, a comment has been posted in a group you subscribed:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
       $msg .= t("Comment title") . ": " . $comment->subject . "\n";
       $msg .= t("Comment author") . ": " . $user->name . "\n";
       $msg .= t("In content") . ": " . $node->title . " (" . $node->type . ")\n";
@@ -684,9 +684,9 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   if ($flag_notify_url_manage_notifications) {
     $msg .= t("Manage all your notifications") . ": " . $base_url . "/" . $flag_notify_url_manage_notifications . "\n";
   }
-  $msg .= t("Manage your defaults") . ": " . t('Edit your user profile and set the "Default settings for notifications" options according to your needs.') . "\n\n";
+  $msg .= t("Manage your defaults") . ": " . t('Edit your user profile and set the "Default notifications settings" options according to your needs.') . "\n\n";
   if ($flag_notify_email_footer) {
-    $msg .= $flag_notify_email_footer;
+    $msg .= drupal_html_to_text($flag_notify_email_footer);
   }
 
   if ($debug) {

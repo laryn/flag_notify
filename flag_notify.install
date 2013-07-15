@@ -13,10 +13,10 @@ function flag_notify_install() {
   $default_notification_field_name = "flag_notify_field_defaults";
   if (!field_info_field($default_notification_field_name)) {
     // Check if the field already exists.
-    $description = $t('Select the ​​default notification options for the contents you create and the replies to your comments. These default options can then be modified on a content or comment base.');
+    $description = $t('Select the ​​default notification options when you create a content or leave a comment. These default options can be overridden on each content or comment.');
     $allowed_values = array(
-      'content' => $t('New comments and modifications on content you create'),
-      'comment' => $t('Replies to your comments'),
+      'content' => $t('New comments and modifications on contents I create'),
+      'comment' => $t('Replies to my comments'),
     );
     $default_value = array(
       0 => array('value' => 'comment'),
@@ -24,11 +24,11 @@ function flag_notify_install() {
     );
 
     if (module_exists('og')) {
-      $description = $t('Select the ​​default notification options for the groups to which you join, the contents you create and the replies to your comments. These default options can then be modified on a per-group, content or comment base.');
+      $description = $t('Select the ​​default notification options when you join a group, create a content or leave a comment. These default options can be overridden on each group, content or comment.');
       $allowed_values = array(
-        'group'   => $t('Activity in the groups you join'),
-        'content' => $t('New comments and modifications on content you create'),
-        'comment' => $t('Replies to your comments'),
+        'group'   => $t('Activity in the groups I join'),
+        'content' => $t('New comments and modifications on contents I create'),
+        'comment' => $t('Replies to my comments'),
       );
       $default_value = array(
         0 => array('value' => 'group'),
@@ -50,7 +50,7 @@ function flag_notify_install() {
       'field_name' => $default_notification_field_name,
       'entity_type' => 'user',
       'bundle' => 'user',
-      'label' => $t('Default settings for notifications'),
+      'label' => $t('Default notifications settings.'),
       'description' => $description,
       'required' => FALSE,
       'widget' => array(
