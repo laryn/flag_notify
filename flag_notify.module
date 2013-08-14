@@ -12,6 +12,9 @@ module_load_include('inc', 'flag_notify', 'flag_notify_settings');
 
 /**
  * Valid permissions for this module.
+ *
+ * Implements hook_permission().
+ *
  * @return array
  *   An array of valid permissions for the test_module module
  */
@@ -44,13 +47,15 @@ function flag_notify_help($path, $arg) {
       return nl2br($output);
 
     case 'admin/config/system/flag_notify':
-      $output = '<p>' . t("Use the <a href='@flag_module_url'>Flag module admin page</a> to define flags for comment, content and/or group notifications and set here their names", array('@flag_module_url' => url('admin/structure/flags'))) . '</p>';
+      $output = '<p>' . t("Use the !flag_module_url to define flags for comment, content and/or group notifications and set here their names", array('!flag_module_url' => l(t('Flag module admin page'), 'admin/structure/flags'))) . '</p>';
       return $output;
   }
 }
 
 /**
  * Menu for this module.
+ *
+ * Implements hook_menu().
  *
  * @return array
  *   An array with this module's settings.
