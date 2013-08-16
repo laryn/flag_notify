@@ -94,7 +94,9 @@ function flag_notify_menu() {
 }
 
 /**
- * Redirect to the module's permission settings. A callback from flag_notify_menu(), not a hook.
+ * Redirect to the module's permission settings.
+ *
+ * A callback from flag_notify_menu(), not a hook.
  */
 function flag_notify_perms() {
   drupal_goto('admin/people/permissions', array('fragment' => 'module-flag_notify'));
