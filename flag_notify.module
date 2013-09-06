@@ -84,7 +84,7 @@ function flag_notify_menu() {
   $items['admin/config/system/flag_notify/permissions'] = array(
     'title' => 'Permissions',
     'description' => 'Configure access permissions',
-    'page callback' => 'flag_notify_perms',
+    'page callback' => 'flag_notify_perms_callback',
     'access arguments' => array('administer flag notify'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
@@ -98,7 +98,7 @@ function flag_notify_menu() {
  *
  * A callback from flag_notify_menu(), not a hook.
  */
-function flag_notify_perms() {
+function flag_notify_perms_callback() {
   drupal_goto('admin/people/permissions', array('fragment' => 'module-flag_notify'));
 }
 
@@ -367,24 +367,8 @@ function flag_notify_og_membership_delete(OgMembership $og_membership) {
  * @param entity $user
  *   The comment or content author (new comment/content), acting user (edited
  *   content) or the new og user.
- * @param bool $debug
- *   A bool option (default=FALSE) to print some debugging information.
  */
-function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALSE) {
-  if ($debug) {
-    drupal_set_message(t("Flag notify module: flag_notify_main has been called with debugging information turned ON."), 'status');
-    dpm("** Debugging flag_notify_main **");
-    dpm("event: ");
-    dpm($event);
-    dpm("groups: ");
-    dpm($groups);
-    dpm("node: ");
-    dpm($node);
-    dpm("comment: ");
-    dpm($comment);
-    dpm("user: ");
-    dpm($user);
-  }
+function flag_notify_main($event, $groups, $node, $comment, $user) {
 
   // Lists of uids that will be notified..
   $users_comment = array();
@@ -452,23 +436,14 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
     }
   }
 
-  if ($debug) {
-    dpm("users_comment: ");
-    dpm($users_comment);
-    dpm("users_content: ");
-    dpm($users_content);
-    dpm("users_group: ");
-    dpm($users_group);
-  }
-
   foreach ($users_comment as $user_comment) {
-    flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_comment, 'comment', $debug);
+    flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_comment, 'comment');
   }
   foreach ($users_content as $user_content) {
-    flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_content, 'content', $debug);
+    flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_content, 'content');
   }
   foreach (array_keys($users_group) as $key) {
-    flag_notify_fire_email($event, $users_group[$key], $node, $comment, $user, $key, 'group', $debug);
+    flag_notify_fire_email($event, $users_group[$key], $node, $comment, $user, $key, 'group');
   }
 }
 
@@ -500,28 +475,14 @@ function flag_notify_main($event, $groups, $node, $comment, $user, $debug = FALS
  *   The uid of the user to notify.
  * @param string $notification_type
  *   The reason this user is notified, either 'comment', 'content' or 'group'.
- * @param bool $debug
- *   A bool option (default=FALSE) to print some debugging information.
  */
-function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetuser_uid, $notification_type, $debug = FALSE) {
-  if ($debug) {
-    dpm("** Debugging flag_notify_fire_email **");
-    dpm("event: ");
-    dpm($event);
-    dpm("group: ");
-    dpm($group);
-    dpm("node: ");
-    dpm($node);
-    dpm("comment: ");
-    dpm($comment);
-    dpm("user: ");
-    dpm($user);
-    dpm("targetuser_uid: ");
-    dpm($targetuser_uid);
-    dpm("notification_type: ");
-    dpm($notification_type);
-  }
+function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetuser_uid, $notification_type) {
   global $base_url;
+  $suspend_notifications = variable_get('flag_notify_suspend_notifications', '0');
+  if ($suspend_notifications) {
+    // Notifications are suspended.
+    return;
+  }
   $site_name = variable_get('site_name', 'Drupal');
   $site_email = variable_get('site_mail', ini_get('sendmail_from'));
   $salutation = variable_get('flag_notify_email_salutation', t('Dear'));
@@ -696,14 +657,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     $msg .= drupal_html_to_text($flag_notify_email_footer);
   }
 
-  if ($debug) {
-    dpm("** Debugging flag_notify_fire_email **");
-    dpm("Subject: ");
-    dpm($subject);
-    dpm("Message:");
-    dpm($msg);
-  }
-
   $params = array();
   $params['subject'] = $subject;
   $params['body'] = $msg;
@@ -713,10 +666,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   // $result = drupal_mail($module, $key, $to, $language, $params, $from,
   // $send);
   $result = drupal_mail('flag_notify', 'notification_email', $tuser->mail, $language, $params, $site_email, TRUE);
-  if ($debug) {
-    dpm("Result of the email sending action: ");
-    dpm($result);
-  }
+
   if ($result['result'] != TRUE) {
     watchdog('flag_notify', 'There was a problem sending the notification and it was not sent.', NULL, WATCHDOG_ERROR);
   }

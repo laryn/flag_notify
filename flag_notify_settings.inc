@@ -84,6 +84,18 @@ function flag_notify_admin($form, &$form_state) {
     '#options' => $use_default_events,
     '#required' => TRUE,
   );
+  $suspend_notifications = array(
+    '1' => t('True (no email is sent)'),
+    '0' => t('False (notifications are active)'),
+  );
+  $form['flag_notify_suspend_notifications'] = array(
+    '#type' => 'select',
+    '#title' => t('Suspend all notifications'),
+    '#default_value' => variable_get('flag_notify_suspend_notifications', '0'),
+    '#description' => t('Use this option when you want to disable all notifications. Events issued during suspended periods will not result in email beeing sent or even queued for sending.'),
+    '#options' => $suspend_notifications,
+    '#required' => TRUE,
+  );
 
   return system_settings_form($form);
 }

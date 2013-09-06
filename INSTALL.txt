@@ -22,7 +22,7 @@ Views + View bulk operation
 subscribed
 -> not provided by flag_notify but easy to implement on each site
 
-** INSTALLATION INSTRUCTIIONS **
+** INSTALLATION INSTRUCTIONS **
 
 1) Download and enable the Organic Group module before Flag Notify if you want
 to use group notification
