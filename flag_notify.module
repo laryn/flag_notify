@@ -490,7 +490,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   $flag_notify_email_footer = variable_get('flag_notify_email_footer', '');
   $tuser = user_load($targetuser_uid);
   $tuser_name = $tuser->name;
-  $tuser_email = $tuser->mail;
   $language = user_preferred_language($tuser);
   $acting_user = $GLOBALS['user'];
   if ($acting_user->uid == $tuser->uid) {
