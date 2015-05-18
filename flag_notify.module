@@ -370,6 +370,19 @@ function flag_notify_og_membership_delete(OgMembership $og_membership) {
  */
 function flag_notify_main($event, $groups, $node, $comment, $user) {
 
+  // @see user_module_invoke()
+  $break = False;
+  foreach (module_implements('flag_notify_event_alter') as $module) {
+    $function = $module . '_flag_notify_event_alter';
+    // will call all modules implementing hook_hook_name
+    // and can pass each argument as reference determined
+    // by the function declaration
+    $function($break, $event, $groups, $node, $comment, $user);
+  }
+  if($break) {
+    return;
+  }
+
   // Lists of uids that will be notified..
   $users_comment = array();
   $users_content = array();
@@ -483,6 +496,20 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     // Notifications are suspended.
     return;
   }
+
+  // @see user_module_invoke()
+  $break = False;
+  foreach (module_implements('flag_notify_notification_alter') as $module) {
+    $function = $module . '_flag_notify_notification_alter';
+    // will call all modules implementing hook_hook_name
+    // and can pass each argument as reference determined
+    // by the function declaration
+    $function($break, $event, $group, $node, $comment, $user, $targetuser_uid, $notification_type);
+  }
+  if($break) {
+    return;
+  }
+
   $site_name = variable_get('site_name', 'Drupal');
   $site_email = variable_get('site_mail', ini_get('sendmail_from'));
   $salutation = variable_get('flag_notify_email_salutation', t('Dear'));

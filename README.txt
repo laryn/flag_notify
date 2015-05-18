@@ -23,6 +23,9 @@ Default notification for users are managed trough an option field in the user
 profiles so they can can choose the default notification settings when
 submitting a comment, a node or join a group.
 
+You can "intercept" the notification and change the event data or "break" it
+using the hooks defined by the module (see flag_notify.api.php).
+
 Currently the notification email text is fixed (with a few customisation as
 footer and salutation). A token-based email may be developed in the next
 versions if there is enought request for that.
