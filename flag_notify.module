@@ -497,6 +497,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     return;
   }
 
+  // --START DEPRECATED CODE--
   // @see user_module_invoke()
   $break = False;
   foreach (module_implements('flag_notify_notification_alter') as $module) {
@@ -509,6 +510,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   if($break) {
     return;
   }
+  // --END DEPRECATED CODE --
 
   $site_name = variable_get('site_name', 'Drupal');
   $site_email = variable_get('site_mail', ini_get('sendmail_from'));
@@ -683,6 +685,21 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     $msg .= drupal_html_to_text($flag_notify_email_footer);
   }
 
+  // @see user_module_invoke()
+  $break = False;
+  foreach (module_implements('flag_notify_message_alter') as $module) {
+    $function = $module . '_flag_notify_message_alter';
+    // will call all modules implementing hook_hook_name
+    // and can pass each argument as reference determined
+    // by the function declaration
+    $function($break, $event, $group, $node, $comment, $user, $tuser, $notification_type, $subject, $msg);
+  }
+  if($break) {
+    return;
+  }
+  
+  
+  
   $params = array();
   $params['subject'] = $subject;
   $params['body'] = $msg;
