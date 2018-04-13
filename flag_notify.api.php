@@ -23,8 +23,10 @@
  * @param entity $user
  *   The comment or content author (new comment/content), acting user (edited
  *   content) or the new og user.
+ * @param bool notifyActingUser
+ *   A (default: False) option to notify users when they are also the acting users.
  */
-function hook_flag_notify_event_alter(&$break, &$event, &$groups, &$node, &$comment, &$user) {
+function hook_flag_notify_event_alter(&$break, &$event, &$groups, &$node, &$comment, &$user, &$notifyActingUser = False) {
 
 }
 

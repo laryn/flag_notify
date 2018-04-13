@@ -372,13 +372,16 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
 
   // @see user_module_invoke()
   $break = False;
+  $notifyActingUser = False;
+
   foreach (module_implements('flag_notify_event_alter') as $module) {
     $function = $module . '_flag_notify_event_alter';
     // will call all modules implementing hook_hook_name
     // and can pass each argument as reference determined
     // by the function declaration
-    $function($break, $event, $groups, $node, $comment, $user);
+    $function($break, $event, $groups, $node, $comment, $user, $notifyActingUser);
   }
+
   if($break) {
     return;
   }
@@ -450,13 +453,19 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
   }
 
   foreach ($users_comment as $user_comment) {
-    flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_comment, 'comment');
+    if($notifyActingUser || ($user->uid != $user_comment)){
+      flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_comment, 'comment');
+    }
   }
   foreach ($users_content as $user_content) {
-    flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_content, 'content');
+    if($notifyActingUser || ($user->uid != $user_content)){
+      flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_content, 'content');
+    }
   }
   foreach (array_keys($users_group) as $key) {
-    flag_notify_fire_email($event, $users_group[$key], $node, $comment, $user, $key, 'group');
+    if($notifyActingUser || ($user->uid != $key)){
+      flag_notify_fire_email($event, $users_group[$key], $node, $comment, $user, $key, 'group');
+    }
   }
 }
 
@@ -521,10 +530,10 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   $tuser_name = $tuser->name;
   $language = user_preferred_language($tuser);
   $acting_user = $GLOBALS['user'];
-  if ($acting_user->uid == $tuser->uid) {
-    // No need to send notification to the acting user!
-    return;
-  }
+  //if ($acting_user->uid == $tuser->uid) {
+  //  // No need to send notification to the acting user!
+  //  return;
+  //}
 
   $subject = "[" . $site_name . "] ";
   $msg = "";
