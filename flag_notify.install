@@ -68,8 +68,6 @@ function flag_notify_install() {
  */
 function flag_notify_uninstall() {
 
-  db_delete('variable')->where('name', "flag_notify_%", 'LIKE');
-
   $default_notification_field_name = "flag_notify_field_defaults";
   $field_instance = array(
     'field_name' => $default_notification_field_name,
@@ -91,11 +89,11 @@ function flag_notify_uninstall() {
 function flag_notify_update_1000() {
   $config = config('flag_notify.settings');
   $config->set('flag_notify_use_default_events', update_variable_get('flag_notify_use_default_events', '1'));
-  $config->set('flag_notify_flag_comment_mname', update_variable_get('flag_notify_flag_comment_mname', '0'));
-  $config->set('flag_notify_flag_content_mname', update_variable_get('flag_notify_flag_content_mname', '0'));
-  $config->set('flag_notify_flag_group_mname', update_variable_get('flag_notify_flag_group_mname', ''));
+  $config->set('flag_notify_comment_subscription', update_variable_get('flag_notify_flag_comment_mname', '0'));
+  $config->set('flag_notify_content_subscription', update_variable_get('flag_notify_flag_content_mname', '0'));
+  $config->set('flag_notify_group_subscription', update_variable_get('flag_notify_flag_group_mname', ''));
   $config->set('flag_notify_suspend_notifications', update_variable_get('flag_notify_suspend_notifications', '0'));
-  $config->set('flag_notify_email_salutation', update_variable_get('flag_notify_email_salutation', 'dynamic value in file /flag_notify/flag_notify_settings.inc line 60'));
+  $config->set('flag_notify_email_salutation', update_variable_get('flag_notify_email_salutation', 'Dear'));
   $config->set('flag_notify_url_manage_notifications', update_variable_get('flag_notify_url_manage_notifications', ''));
   $config->set('flag_notify_email_footer', update_variable_get('flag_notify_email_footer', ''));
   $config->save();

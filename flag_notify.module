@@ -11,12 +11,21 @@
 module_load_include('inc', 'flag_notify', 'flag_notify_settings');
 
 /**
- * Valid permissions for this module.
- *
+ * Implements hook_config_info().
+ */
+function flag_notify_config_info() {
+  $prefixes['flag_notify.settings'] = array(
+    'label' => t('Flag Notify settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
  * Implements hook_permission().
  *
  * @return array
- *   An array of valid permissions for the test_module module
+ *   An array of valid permissions for the flag_notify module.
  */
 function flag_notify_permission() {
   return array(
@@ -28,33 +37,6 @@ function flag_notify_permission() {
 }
 
 /**
- * Display help and module information.
- *
- * Implements hook_help().
- *
- * @param string $path
- *   Which path of the site we're displaying help.
- * @param array $arg
- *   Array that holds the current path as would be returned from arg() function.
- *
- * @return string
- *   Help text for the path.
- */
-function flag_notify_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#flag_notify':
-      $output = file_get_contents(backdrop_get_path('module', 'flag_notify') . '/README.txt');
-      return nl2br($output);
-
-    case 'admin/config/system/flag_notify':
-      $output = '<p>' . t("Use the !flag_module_url to define flags for comment, content and/or group notifications and set here their names", array('!flag_module_url' => l(t('Flag module admin page'), 'admin/structure/flags'))) . '</p>';
-      return $output;
-  }
-}
-
-/**
- * Menu for this module.
- *
  * Implements hook_menu().
  *
  * @return array
@@ -99,7 +81,7 @@ function flag_notify_menu() {
  * A callback from flag_notify_menu(), not a hook.
  */
 function flag_notify_perms_callback() {
-  backdrop_goto('admin/people/permissions', array('fragment' => 'module-flag_notify'));
+  backdrop_goto('admin/config/people/permissions', array('fragment' => 'module-flag_notify'));
 }
 
 /**
@@ -118,16 +100,6 @@ function flag_notify_field_access($op, $field, $entity_type, $entity, $account) 
 
 
 // ****************** logic of the module starts here *************************
-/**
- * Implements hook_config_info().
- */
-function flag_notify_config_info() {
-  $prefixes['flag_notify.settings'] = array(
-    'label' => t('Flag Notify settings'),
-    'group' => t('Configuration'),
-  );
-  return $prefixes;
-}
 
 /**
  * Implements hook_comment_publish().
@@ -155,13 +127,13 @@ function flag_notify_comment_publish($comment) {
   // Fire notification.
   flag_notify_main('new_comment', $groups, $node, $comment, $user);
 
-  // Flag user to follow its own comment if that's in its options.
+  // Flag user to follow their own comment if selected.
   $user_default_options = field_get_items('user', $user, 'flag_notify_field_defaults');
-  $flag_notify_flag_comment_mname = $config->get('flag_notify_flag_comment_mname');
+  $flag_notify_comment_subscription = $config->get('flag_notify_comment_subscription');
   if ($user_default_options) {
     foreach ($user_default_options as $option) {
-      if ($option['value'] == 'comment' && $flag_notify_flag_comment_mname) {
-        $flag = flag_get_flag($flag_notify_flag_comment_mname);
+      if ($option['value'] == 'comment' && $flag_notify_comment_subscription) {
+        $flag = flag_get_flag($flag_notify_comment_subscription);
         $flag->flag('flag', $comment->cid, $user);
         break;
       }
@@ -196,11 +168,11 @@ function flag_notify_node_insert($node) {
 
     // Flag user to follow its own node if that's in its options.
     $user_default_options = field_get_items('user', $user, 'flag_notify_field_defaults');
-    $flag_notify_flag_content_mname = $config->get('flag_notify_flag_content_mname');
+    $flag_notify_content_subscription = $config->get('flag_notify_content_subscription');
     if ($user_default_options) {
       foreach ($user_default_options as $option) {
-        if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
-          $flag = flag_get_flag($flag_notify_flag_content_mname);
+        if ($option['value'] == 'content' && $flag_notify_content_subscription) {
+          $flag = flag_get_flag($flag_notify_content_subscription);
           $flag->flag('flag', $node->nid, $user);
           break;
         }
@@ -240,11 +212,11 @@ function flag_notify_node_update($node) {
 
       // Flag user to follow its own node if that's in its options.
       $user_default_options = field_get_items('user', $user, 'flag_notify_field_defaults');
-      $flag_notify_flag_content_mname = $config->get('flag_notify_flag_content_mname');
+      $flag_notify_content_subscription = $config->get('flag_notify_content_subscription');
       if ($user_default_options) {
         foreach ($user_default_options as $option) {
-          if ($option['value'] == 'content' && $flag_notify_flag_content_mname) {
-            $flag = flag_get_flag($flag_notify_flag_content_mname);
+          if ($option['value'] == 'content' && $flag_notify_content_subscription) {
+            $flag = flag_get_flag($flag_notify_content_subscription);
             $flag->flag('flag', $node->nid, $user);
             break;
           }
@@ -287,11 +259,11 @@ function flag_notify_og_membership_insert(OgMembership $og_membership) {
   // Flag user to follow the group activity it just joined if that's in its
   // options.
   $user_default_options = field_get_items('user', $account, 'flag_notify_field_defaults');
-  $flag_notify_flag_group_mname = $config->get('flag_notify_flag_group_mname');
+  $flag_notify_group_subscription = $config->get('flag_notify_group_subscription');
   if ($user_default_options) {
     foreach ($user_default_options as $option) {
-      if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
-        $flag = flag_get_flag($flag_notify_flag_group_mname);
+      if ($option['value'] == 'group' && $flag_notify_group_subscription) {
+        $flag = flag_get_flag($flag_notify_group_subscription);
         $flag->flag('flag', $group->nid, $account);
         break;
       }
@@ -322,11 +294,11 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
     // Glag user to follow the group activity it just joined if that's in its
     // options.
     $user_default_options = field_get_items('user', $account, 'flag_notify_field_defaults');
-    $flag_notify_flag_group_mname = $config->get('flag_notify_flag_group_mname');
+    $flag_notify_group_subscription = $config->get('flag_notify_group_subscription');
     if ($user_default_options) {
       foreach ($user_default_options as $option) {
-        if ($option['value'] == 'group' && $flag_notify_flag_group_mname) {
-          $flag = flag_get_flag($flag_notify_flag_group_mname);
+        if ($option['value'] == 'group' && $flag_notify_group_subscription) {
+          $flag = flag_get_flag($flag_notify_group_subscription);
           $flag->flag('flag', $group->nid, $account);
           break;
         }
@@ -338,9 +310,9 @@ function flag_notify_og_membership_update(OgMembership $og_membership) {
     // TODO: remove notification only for private groups.
     $account = user_load($og_membership->etid);
     $group = node_load($og_membership->gid);
-    $flag_notify_flag_group_mname = $config->get('flag_notify_flag_group_mname');
-    if ($flag_notify_flag_group_mname) {
-      $flag = flag_get_flag($flag_notify_flag_group_mname);
+    $flag_notify_group_subscription = $config->get('flag_notify_group_subscription');
+    if ($flag_notify_group_subscription) {
+      $flag = flag_get_flag($flag_notify_group_subscription);
       $flag->flag('unflag', $group->nid, $account);
     }
   }
@@ -357,9 +329,9 @@ function flag_notify_og_membership_delete(OgMembership $og_membership) {
   // TODO: remove notification only for private groups.
   $account = user_load($og_membership->etid);
   $group = node_load($og_membership->gid);
-  $flag_notify_flag_group_mname = config_get('flag_notify.settings', 'flag_notify_flag_group_mname');
-  if ($flag_notify_flag_group_mname) {
-    $flag = flag_get_flag($flag_notify_flag_group_mname);
+  $flag_notify_group_subscription = config_get('flag_notify.settings', 'flag_notify_group_subscription');
+  if ($flag_notify_group_subscription) {
+    $flag = flag_get_flag($flag_notify_group_subscription);
     $flag->flag('unflag', $group->nid, $account);
   }
 }
@@ -393,9 +365,9 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
 
   foreach (module_implements('flag_notify_event_alter') as $module) {
     $function = $module . '_flag_notify_event_alter';
-    // will call all modules implementing hook_hook_name
+    // Will call all modules implementing hook_hook_name
     // and can pass each argument as reference determined
-    // by the function declaration
+    // by the function declaration.
     $function($break, $event, $groups, $node, $comment, $user, $notifyActingUser);
   }
 
@@ -403,17 +375,19 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
     return;
   }
 
-  // Lists of uids that will be notified..
+  // Lists of uids that will be notified.
   $users_comment = array();
   $users_content = array();
+  $users_term = array();
   $users_group = array();
 
-  $flag_notify_flag_comment_mname = $config->get('flag_notify_flag_comment_mname');
-  $flag_notify_flag_content_mname = $config->get('flag_notify_flag_content_mname');
-  $flag_notify_flag_group_mname = $config->get('flag_notify_flag_group_mname');
+  $flag_notify_comment_subscription = $config->get('flag_notify_comment_subscription');
+  $flag_notify_content_subscription = $config->get('flag_notify_content_subscription');
+  $flag_notify_term_subscription = $config->get('flag_notify_term_subscription');
+  $flag_notify_group_subscription = $config->get('flag_notify_group_subscription');
 
-  // Checking who has flagged the parent comments for reply notification..
-  if ($flag_notify_flag_comment_mname && $event == 'new_comment') {
+  // Check who has flagged the parent comments for reply notification.
+  if ($flag_notify_comment_subscription && $event == 'new_comment') {
     $threads = explode('.', $comment->thread);
     $thread = "";
     $pnids = array();
@@ -434,7 +408,7 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
       $thread .= ".";
     }
     foreach ($pnids as $pnid) {
-      $users_comment_data = flag_get_entity_flags('comment', $pnid, $flag_notify_flag_comment_mname);
+      $users_comment_data = flag_get_entity_flags('comment', $pnid, $flag_notify_comment_subscription);
       foreach ($users_comment_data as $user_comment_data) {
         if (!array_key_exists($user_comment_data->uid, $users_comment)) {
           $users_comment[$user_comment_data->uid] = $user_comment_data->uid;
@@ -443,9 +417,9 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
     }
   }
 
-  // Checking who has flagged the node for comment/edit notification..
-  if ($flag_notify_flag_content_mname && $event != 'new_user') {
-    $users_content_data = flag_get_entity_flags('node', $node->nid, $flag_notify_flag_content_mname);
+  // Check who has flagged the node for comment/edit notification.
+  if ($flag_notify_content_subscription && $event != 'new_user') {
+    $users_content_data = flag_get_entity_flags('node', $node->nid, $flag_notify_content_subscription);
     foreach ($users_content_data as $user_content_data) {
       if ((!array_key_exists($user_content_data->uid, $users_comment)) &&
           (!array_key_exists($user_content_data->uid, $users_content))) {
@@ -454,10 +428,29 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
     }
   }
 
-  // Checking who has flagged the og group for activities notifications..
-  if ($flag_notify_flag_group_mname) {
+  // Check who has flagged the term for content add/edit notification.
+  if ($flag_notify_term_subscription && $event != 'new_user') {
+    $term_flags = flag_get_flags('taxonomy_term');
+    $vocabulary_name = $term_flags[$flag_notify_term_subscription]->types[0];
+    $vocabulary_field = 'field_' . $vocabulary_name;
+    $langcode = $node->langcode;
+    $vocabtid = $vocabulary_name . '_tid';
+    if (isset($node->$vocabtid)) {
+      $tid = $node->$vocabtid;
+      $users_term_data = flag_get_entity_flags('taxonomy_term', $tid, $flag_notify_term_subscription);
+      foreach ($users_term_data as $user_term_data) {
+        if ((!array_key_exists($user_term_data->uid, $users_comment)) &&
+            (!array_key_exists($user_term_data->uid, $users_term))) {
+          $users_term[$user_term_data->uid] = $user_term_data->uid;
+        }
+      }
+    }
+  }
+
+  // Check who has flagged the og group for activities notifications.
+  if ($flag_notify_group_subscription) {
     foreach ($groups as $group) {
-      $users_group_data = flag_get_entity_flags('node', $group->nid, $flag_notify_flag_group_mname);
+      $users_group_data = flag_get_entity_flags('node', $group->nid, $flag_notify_group_subscription);
       foreach ($users_group_data as $user_group_data) {
         if ((!array_key_exists($user_group_data->uid, $users_comment)) &&
             (!array_key_exists($user_group_data->uid, $users_content)) &&
@@ -479,6 +472,11 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
       flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_content, 'content');
     }
   }
+  foreach ($users_term as $user_term) {
+    if ($notifyActingUser || ($user->uid != $user_term)) {
+      flag_notify_fire_email($event, NULL, $node, $comment, $user, $user_term, 'term');
+    }
+  }
   foreach (array_keys($users_group) as $key) {
     if ($notifyActingUser || ($user->uid != $key)) {
       flag_notify_fire_email($event, $users_group[$key], $node, $comment, $user, $key, 'group');
@@ -497,6 +495,8 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
  * - group - new_content
  * - group - edited_content
  * - group - new_users
+ * - term - new_content
+ * - term - edited_content
  *
  * @param string $event
  *   Type of event issued, either 'new_comment', 'new_content',
@@ -513,7 +513,7 @@ function flag_notify_main($event, $groups, $node, $comment, $user) {
  * @param int $targetuser_uid
  *   The uid of the user to notify.
  * @param string $notification_type
- *   The reason this user is notified, either 'comment', 'content' or 'group'.
+ *   The reason this user is notified, either 'comment', 'content', 'term' or 'group'.
  */
 function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetuser_uid, $notification_type) {
   $config = config('flag_notify.settings');
@@ -524,23 +524,8 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     return;
   }
 
-  // --START DEPRECATED CODE--
-  // @see user_module_invoke()
-  $break = False;
-  foreach (module_implements('flag_notify_notification_alter') as $module) {
-    $function = $module . '_flag_notify_notification_alter';
-    // will call all modules implementing hook_hook_name
-    // and can pass each argument as reference determined
-    // by the function declaration
-    $function($break, $event, $group, $node, $comment, $user, $targetuser_uid, $notification_type);
-  }
-  if ($break) {
-    return;
-  }
-  // --END DEPRECATED CODE --
-
-  $site_name = config_get('system.performance', 'site_name');
-  $site_email = config_get('system.performance', 'site_mail');
+  $site_name = config_get('system.core', 'site_name');
+  $site_email = config_get('system.core', 'site_mail');
   $salutation = $config->get('flag_notify_email_salutation');
   $flag_notify_url_manage_notifications = $config->get('flag_notify_url_manage_notifications');
   $flag_notify_email_footer = $config->get('flag_notify_email_footer');
@@ -558,8 +543,8 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
   if ($notification_type == 'comment') {
 
-    $flag_notify_flag_comment_mname = $config->get('flag_notify_flag_comment_mname');
-    $flag = flag_get_flag($flag_notify_flag_comment_mname);
+    $flag_notify_comment_subscription = $config->get('flag_notify_comment_subscription');
+    $flag = flag_get_flag($flag_notify_comment_subscription);
     $unflag_text = $flag->unflag_short;
     $cbody_field = field_get_items('comment', $comment, 'comment_body');
     $cbody = "";
@@ -583,8 +568,8 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
   }
   elseif ($notification_type == 'content') {
-    $flag_notify_flag_content_mname = $config->get('flag_notify_flag_content_mname');
-    $flag = flag_get_flag($flag_notify_flag_content_mname);
+    $flag_notify_content_subscription = $config->get('flag_notify_content_subscription');
+    $flag = flag_get_flag($flag_notify_content_subscription);
     $unflag_text = $flag->unflag_short;
 
     if ($event == 'new_comment') {
@@ -619,7 +604,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
     }
     else {
-      watchdog('flag_notify', 'Got an unknow event under "content" notification_type. Don\'t know how to handle it');
+      watchdog('flag_notify', 'Got an unknown event under "content" notification_type. Don\'t know how to handle it');
       return;
     }
     $msg .= t("Browse !user_name profile", array('!user_name' => $user->name)) . ": " . $base_url . "/user/" . $user->uid . "\n";
@@ -629,10 +614,37 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       t('click the "!unflag_text" link on the content', array('!unflag_text' => $unflag_text)) . "\n";
 
   }
-  elseif ($notification_type == 'group') {
-
-    $flag_notify_flag_group_mname = $config->get('flag_notify_flag_group_mname');
-    $flag = flag_get_flag($flag_notify_flag_group_mname);
+  elseif ($notification_type == 'term') {
+    $flag_notify_term_subscription = $config->get('flag_notify_term_subscription');
+    $flag = flag_get_flag($flag_notify_term_subscription);
+    $unflag_text = $flag->unflag_short;
+    $subject .= "[" . $flag_notify_term_subscription . "] ";
+    if ($event == 'edited_content') {
+      $subject .= t('Content modified.');
+      $msg .= t("!salutation !tuser_name, content in a term you subscribed has been edited:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
+      $msg .= t("Title") . ": " . $node->title . "\n";
+      $msg .= t("Type") . ": " . $node->type . "\n";
+      $msg .= t("In group") . ": " . $group->title . "\n";
+      $msg .= t("Author of the editing(s)") . ": " . $user->name . "\n";
+      $msg .= "-----------------\n";
+      $msg .= "*** " . t('ACTIONS') . " ***\n";
+      $msg .= t("View the edited content") . ": " . $base_url . "/node/" . $node->nid . "\n";
+    }
+    elseif ($event == 'new_content') {
+      $subject .= t('New content.');
+      $msg .= t("!salutation !tuser_name, content has been posted in a term you subscribed:\n\n", array('!salutation' => $salutation, '!tuser_name' => $tuser_name));
+      $msg .= t("Title") . ": " . $node->title . "\n";
+      $msg .= t("Type") . ": " . $node->type . "\n";
+      $msg .= t("In group") . ": " . $group->title . "\n";
+      $msg .= t("Author") . ": " . $user->name . "\n";
+      $msg .= "-----------------\n";
+      $msg .= "*** " . t('ACTIONS') . " ***\n";
+      $msg .= t("View the new content") . ": " . $base_url . "/node/" . $node->nid . "\n";
+    }
+  }
+  elseif (module_exists('og') && $notification_type == 'group') {
+    $flag_notify_group_subscription = $config->get('flag_notify_group_subscription');
+    $flag = flag_get_flag($flag_notify_group_subscription);
     $unflag_text = $flag->unflag_short;
     $subject .= "[" . $group->title . "] ";
     if ($event == 'new_comment') {
@@ -675,7 +687,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       $msg .= "-----------------\n";
       $msg .= "*** " . t('ACTIONS') . " ***\n";
       $msg .= t("View the new content") . ": " . $base_url . "/node/" . $node->nid . "\n";
-
     }
     elseif ($event == 'new_user') {
       $subject .= t('New user.');
@@ -688,7 +699,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
       $msg .= "*** " . t('ACTIONS') . " ***\n";
     }
     else {
-      watchdog('flag_notify', 'Got an unknow event under "group" notification_type. Don\'t know how to handle it');
+      watchdog('flag_notify', 'Got an unknown event under "group" notification_type. Don\'t know how to handle it');
       return;
     }
 
@@ -700,7 +711,7 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
 
   }
   else {
-    watchdog('flag_notify', 'Got an unknow notification_type. Don\'t know how to handle it');
+    watchdog('flag_notify', 'Got an unknown notification_type. Don\'t know how to handle it');
     return;
   }
 
@@ -725,16 +736,10 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     return;
   }
 
-
-
   $params = array();
   $params['subject'] = $subject;
   $params['body'] = $msg;
 
-  // http://backdropcode.org/project/examples.git/blob_plain/refs/heads/7.x-1.x:/
-  // email_example/email_example.module
-  // $result = backdrop_mail($module, $key, $to, $language, $params, $from,
-  // $send);
   $result = backdrop_mail('flag_notify', 'notification_email', $tuser->mail, $language, $params, $site_email, TRUE);
 
   if ($result['result'] != TRUE) {

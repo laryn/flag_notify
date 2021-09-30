@@ -13,8 +13,10 @@ function flag_notify_admin($form, &$form_state) {
 
   $flags_comment_objs = flag_get_flags('comment');
   $flags_content_objs = flag_get_flags('node');
+  $flags_term_objs = flag_get_flags('taxonomy_term');
   $flags_comment = array('0' => 'None');
   $flags_content = array('0' => 'None');
+  $flags_term = array('0' => 'None');
 
   foreach ($flags_comment_objs as $flags_comment_obj) {
     $flags_comment[$flags_comment_obj->name] = $flags_comment_obj->title;
@@ -22,31 +24,44 @@ function flag_notify_admin($form, &$form_state) {
   foreach ($flags_content_objs as $flags_content_obj) {
     $flags_content[$flags_content_obj->name] = $flags_content_obj->title;
   }
+  foreach ($flags_term_objs as $flags_term_obj) {
+    $flags_term[$flags_term_obj->name] = $flags_term_obj->title;
+  }
   $form['#config'] = 'flag_notify.settings';
-  $form['flag_notify_flag_comment_mname'] = array(
+  $form['flag_notify_comment_subscription'] = array(
     '#type' => 'select',
-    '#title' => t('Comment Subscription Flag'),
-    '#default_value' => $config->get('flag_notify_flag_comment_mname'),
-    '#description' => t('Choose the flag to use for comments follow-up notification.'),
+    '#title' => t('Comment Subscription'),
+    '#default_value' => $config->get('flag_notify_comment_subscription'),
+    '#description' => t('Flag to follow replies to a comment.'),
     '#options' => $flags_comment,
     '#required' => FALSE,
   );
-  $form['flag_notify_flag_content_mname'] = array(
+  $form['flag_notify_content_subscription'] = array(
     '#type' => 'select',
-    '#title' => t('Content Subscription Flag'),
-    '#default_value' => $config->get('flag_notify_flag_content_mname'),
+    '#title' => t('Content Subscription'),
+    '#default_value' => $config->get('flag_notify_content_subscription'),
     '#options' => $flags_content,
-    '#description' => t('Choose the flag to use for notification of comments and edits in a given content.'),
+    '#description' => t('Flag to follow replies on a content item.'),
     '#required' => FALSE,
   );
-  $form['flag_notify_flag_group_mname'] = array(
+  $form['flag_notify_term_subscription'] = array(
     '#type' => 'select',
-    '#title' => t('Group Subscription Flag.'),
-    '#default_value' => $config->get('flag_notify_flag_group_mname'),
-    '#options' => $flags_content,
-    '#description' => t('Choose the flag to use for group activity notification.'),
+    '#title' => t('Term Subscription'),
+    '#default_value' => $config->get('flag_notify_term_subscription'),
+    '#options' => $flags_term,
+    '#description' => t('Flag to follow content tagged with a term.'),
     '#required' => FALSE,
   );
+  if (module_exists('og')) {
+    $form['flag_notify_group_subscription'] = array(
+      '#type' => 'select',
+      '#title' => t('Group Subscription'),
+      '#default_value' => $config->get('flag_notify_group_subscription'),
+      '#options' => $flags_content,
+      '#description' => t('Flag to follow activity in a group.'),
+      '#required' => FALSE,
+    );
+  }
   $form['flag_notify_url_manage_notifications'] = array(
     '#type' => 'textfield',
     '#title' => t('Manage own notifications URL'),
@@ -62,7 +77,7 @@ function flag_notify_admin($form, &$form_state) {
     '#default_value' => $config->get('flag_notify_email_salutation'),
     '#size' => 80,
     '#maxlength' => 255,
-    '#description' => t('How to address your users ?'),
+    '#description' => t('How to address your users?'),
     '#required' => FALSE,
   );
   $form['flag_notify_email_footer'] = array(
@@ -94,7 +109,7 @@ function flag_notify_admin($form, &$form_state) {
     '#type' => 'select',
     '#title' => t('Suspend all notifications'),
     '#default_value' => $config->get('flag_notify_suspend_notifications'),
-    '#description' => t('Use this option when you want to disable all notifications. Events issued during suspended periods will not result in email beeing sent or even queued for sending.'),
+    '#description' => t('Use this option when you want to disable all notifications. Events issued during suspended periods will not result in email being sent or even queued for sending.'),
     '#options' => $suspend_notifications,
     '#required' => TRUE,
   );
