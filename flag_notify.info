@@ -1,6 +1,7 @@
 name = "Flag Notify"
 description = "Uses the flag module to subscribe to comments, nodes or groups."
-core = 7.x
+backdrop = 1.x
+type = module
 package = Flags
 
 dependencies[] = flag

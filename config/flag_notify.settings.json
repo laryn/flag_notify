@@ -1,0 +1,11 @@
+{
+    "_config_name": "flag_notify.settings",
+    "flag_notify_use_default_events": "1",
+    "flag_notify_flag_comment_mname": "0",
+    "flag_notify_flag_content_mname": "0",
+    "flag_notify_flag_group_mname": "",
+    "flag_notify_suspend_notifications": "0",
+    "flag_notify_email_salutation": "Dear ",
+    "flag_notify_url_manage_notifications": "",
+    "flag_notify_email_footer": ""
+}

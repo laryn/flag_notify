@@ -26,7 +26,7 @@ function flag_notify_install() {
     if (module_exists('og')) {
       $description = $t('Select the ​​default notification options when you join a group, create a content or leave a comment. These default options can be overridden on each group, content or comment.');
       $allowed_values = array(
-        'group'   => $t('Activity in the groups I join'),
+        'group' => $t('Activity in the groups I join'),
         'content' => $t('New comments and modifications on contents I create'),
         'comment' => $t('Replies to my comments'),
       );
@@ -59,6 +59,8 @@ function flag_notify_install() {
       'default_value' => $default_value,
     ));
   }
+  // Dynamically generated variable data was detected on the following lines.
+  // /flag_notify/flag_notify_settings.inc line 60
 }
 
 /**
@@ -81,4 +83,29 @@ function flag_notify_uninstall() {
   // https://drupal.org/node/1203876
   field_purge_batch(30);
   field_purge_batch(30);
+}
+
+/**
+ * Migrate flag_notify variables to config.
+ */
+function flag_notify_update_1000() {
+  $config = config('flag_notify.settings');
+  $config->set('flag_notify_use_default_events', update_variable_get('flag_notify_use_default_events', '1'));
+  $config->set('flag_notify_flag_comment_mname', update_variable_get('flag_notify_flag_comment_mname', '0'));
+  $config->set('flag_notify_flag_content_mname', update_variable_get('flag_notify_flag_content_mname', '0'));
+  $config->set('flag_notify_flag_group_mname', update_variable_get('flag_notify_flag_group_mname', ''));
+  $config->set('flag_notify_suspend_notifications', update_variable_get('flag_notify_suspend_notifications', '0'));
+  $config->set('flag_notify_email_salutation', update_variable_get('flag_notify_email_salutation', 'dynamic value in file /flag_notify/flag_notify_settings.inc line 60'));
+  $config->set('flag_notify_url_manage_notifications', update_variable_get('flag_notify_url_manage_notifications', ''));
+  $config->set('flag_notify_email_footer', update_variable_get('flag_notify_email_footer', ''));
+  $config->save();
+
+  update_variable_del('flag_notify_use_default_events');
+  update_variable_del('flag_notify_flag_comment_mname');
+  update_variable_del('flag_notify_flag_content_mname');
+  update_variable_del('flag_notify_flag_group_mname');
+  update_variable_del('flag_notify_suspend_notifications');
+  update_variable_del('flag_notify_email_salutation');
+  update_variable_del('flag_notify_url_manage_notifications');
+  update_variable_del('flag_notify_email_footer');
 }
