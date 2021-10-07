@@ -28,75 +28,51 @@ function flag_notify_admin($form, &$form_state) {
     $flags_term[$flags_term_obj->name] = $flags_term_obj->title;
   }
   $form['#config'] = 'flag_notify.settings';
-  $form['flag_notify_comment_subscription'] = array(
+  $form['comment_subscription'] = array(
     '#type' => 'select',
     '#title' => t('Comment Subscription'),
-    '#default_value' => $config->get('flag_notify_comment_subscription'),
+    '#default_value' => $config->get('comment_subscription'),
     '#description' => t('Flag to follow replies to a comment.'),
     '#options' => $flags_comment,
     '#required' => FALSE,
   );
-  $form['flag_notify_content_subscription'] = array(
+
+  $form['content_subscription'] = array(
     '#type' => 'select',
     '#title' => t('Content Subscription'),
-    '#default_value' => $config->get('flag_notify_content_subscription'),
+    '#default_value' => $config->get('content_subscription'),
     '#options' => $flags_content,
     '#description' => t('Flag to follow replies on a content item.'),
     '#required' => FALSE,
   );
-  $form['flag_notify_term_subscription'] = array(
+
+  $form['term_subscription'] = array(
     '#type' => 'select',
     '#title' => t('Term Subscription'),
-    '#default_value' => $config->get('flag_notify_term_subscription'),
+    '#default_value' => $config->get('term_subscription'),
     '#options' => $flags_term,
     '#description' => t('Flag to follow content tagged with a term.'),
     '#required' => FALSE,
   );
+
   if (module_exists('og')) {
-    $form['flag_notify_group_subscription'] = array(
+    $form['group_subscription'] = array(
       '#type' => 'select',
       '#title' => t('Group Subscription'),
-      '#default_value' => $config->get('flag_notify_group_subscription'),
+      '#default_value' => $config->get('group_subscription'),
       '#options' => $flags_content,
       '#description' => t('Flag to follow activity in a group.'),
       '#required' => FALSE,
     );
   }
-  $form['flag_notify_url_manage_notifications'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Manage own notifications URL'),
-    '#default_value' => $config->get('flag_notify_url_manage_notifications'),
-    '#size' => 80,
-    '#maxlength' => 255,
-    '#description' => t('A relative URL (if any) where you allow users to manage their subscriptions, typically using a view. If provided, a text like "manage your notifications" will be added at the end of each sent email. Please provide a URL relative to the Backdrop root, starting without "/".'),
-    '#required' => FALSE,
-  );
-  $form['flag_notify_email_salutation'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Email salutation'),
-    '#default_value' => $config->get('flag_notify_email_salutation'),
-    '#size' => 80,
-    '#maxlength' => 255,
-    '#description' => t('How to address your users?'),
-    '#required' => FALSE,
-  );
-  $form['flag_notify_email_footer'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Email footer'),
-    '#default_value' => $config->get('flag_notify_email_footer'),
-    '#size' => 80,
-    '#maxlength' => 255,
-    '#description' => t("An optional email footer. Basic HTML mark-up will be converted in text equivalent."),
-    '#required' => FALSE,
-  );
   $use_default_events = array(
     '1' => t('True'),
     '0' => t('False'),
   );
-  $form['flag_notify_use_default_events'] = array(
+  $form['use_default_events'] = array(
     '#type' => 'select',
     '#title' => t('Use default events'),
-    '#default_value' => $config->get('flag_notify_use_default_events'),
+    '#default_value' => $config->get('use_default_events'),
     '#description' => t('Flag Notify already comes with its own event handler (new comment, node edit..). If you prefer instead to call directly <em>node_flag_main()</em>, e.g. using rules, change this option to <em>FALSE</em>'),
     '#options' => $use_default_events,
     '#required' => TRUE,
@@ -105,14 +81,139 @@ function flag_notify_admin($form, &$form_state) {
     '1' => t('True (no email is sent)'),
     '0' => t('False (notifications are active)'),
   );
-  $form['flag_notify_suspend_notifications'] = array(
+  $form['suspend_notifications'] = array(
     '#type' => 'select',
     '#title' => t('Suspend all notifications'),
-    '#default_value' => $config->get('flag_notify_suspend_notifications'),
+    '#default_value' => $config->get('suspend_notifications'),
     '#description' => t('Use this option when you want to disable all notifications. Events issued during suspended periods will not result in email being sent or even queued for sending.'),
     '#options' => $suspend_notifications,
     '#required' => TRUE,
   );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Config form shown at admin/config/system/flag_notify.
+ */
+function flag_notify_email_templates($form, &$form_state) {
+  $config = config('flag_notify.settings');
+  $content_sub = $config->get('content_subscription');
+  $comment_sub = $config->get('comment_subscription');
+  $term_sub = $config->get('term_subscription');
+  $group_sub = $config->get('group_subscription');
+
+  $form['#config'] = 'flag_notify.settings';
+  if ($comment_sub || $content_sub || $group_sub) {
+    /* New comment notifications */
+    $form['comment_subscription_email'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Comment subscription email settings'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#attributes' => array(
+        'class' => array(
+          'flag-notify-email-settings',
+        ),
+      ),
+    );
+    $form['comment_subscription_email']['comment_email_subject'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Subject'),
+      '#default_value' => $config->get('comment_email_subject'),
+      '#size' => 80,
+      '#maxlength' => 255,
+      '#required' => FALSE,
+    );
+      $form['comment_subscription_email']['comment_email_body'] = array(
+      '#title' => t('Message'),
+      '#type' => 'textarea',
+      '#default_value' => $config->get('comment_email_body'),
+    );
+  }
+  if ($term_sub || $group_sub) {
+    /* New content notification */
+    $form['content_subscription_email'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Content subscription email settings (new content)'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#attributes' => array(
+        'class' => array(
+          'flag-notify-email-settings',
+        ),
+      ),
+    );
+    $form['content_subscription_email']['content_email_subject'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Subject'),
+      '#default_value' => $config->get('content_email_subject'),
+      '#size' => 80,
+      '#maxlength' => 255,
+      '#required' => FALSE,
+    );
+    $form['content_subscription_email']['content_email_body'] = array(
+      '#title' => t('Message'),
+      '#type' => 'textarea',
+      '#default_value' => $config->get('content_email_body'),
+    );
+  }
+
+  if ($content_sub || $term_sub || $group_sub) {
+    /* Edited content notifications */
+    $form['content_subscription_email_edited'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Content subscription email settings (edited content)'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#attributes' => array(
+        'class' => array(
+          'flag-notify-email-settings',
+        ),
+      ),
+    );
+    $form['content_subscription_email_edited']['content_email_subject_edited'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Subject'),
+      '#default_value' => $config->get('content_email_subject_edited'),
+      '#size' => 80,
+      '#maxlength' => 255,
+      '#required' => FALSE,
+    );
+    $form['content_subscription_email_edited']['content_email_body_edited'] = array(
+      '#title' => t('Message'),
+      '#type' => 'textarea',
+      '#default_value' => $config->get('content_email_body_edited'),
+    );
+  }
+
+  if (module_exists('og') && $group_sub) {
+    /* New user notification */
+    $form['user_subscription_email'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Group: New user email settings'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#attributes' => array(
+        'class' => array(
+          'flag-notify-email-settings',
+        ),
+      ),
+    );
+    $form['user_subscription_email']['user_email_subject'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Subject'),
+      '#default_value' => $config->get('user_email_subject'),
+      '#size' => 80,
+      '#maxlength' => 255,
+      '#required' => FALSE,
+    );
+    $form['user_subscription_email']['user_email_body'] = array(
+      '#title' => t('Message'),
+      '#type' => 'textarea',
+      '#default_value' => $config->get('user_email_body'),
+    );
+  }
 
   return system_settings_form($form);
 }

@@ -88,14 +88,11 @@ function flag_notify_uninstall() {
  */
 function flag_notify_update_1000() {
   $config = config('flag_notify.settings');
-  $config->set('flag_notify_use_default_events', update_variable_get('flag_notify_use_default_events', '1'));
-  $config->set('flag_notify_comment_subscription', update_variable_get('flag_notify_flag_comment_mname', '0'));
-  $config->set('flag_notify_content_subscription', update_variable_get('flag_notify_flag_content_mname', '0'));
-  $config->set('flag_notify_group_subscription', update_variable_get('flag_notify_flag_group_mname', ''));
-  $config->set('flag_notify_suspend_notifications', update_variable_get('flag_notify_suspend_notifications', '0'));
-  $config->set('flag_notify_email_salutation', update_variable_get('flag_notify_email_salutation', 'Dear'));
-  $config->set('flag_notify_url_manage_notifications', update_variable_get('flag_notify_url_manage_notifications', ''));
-  $config->set('flag_notify_email_footer', update_variable_get('flag_notify_email_footer', ''));
+  $config->set('use_default_events', update_variable_get('flag_notify_use_default_events', '1'));
+  $config->set('comment_subscription', update_variable_get('flag_notify_flag_comment_mname', '0'));
+  $config->set('content_subscription', update_variable_get('flag_notify_flag_content_mname', '0'));
+  $config->set('group_subscription', update_variable_get('flag_notify_flag_group_mname', ''));
+  $config->set('suspend_notifications', update_variable_get('flag_notify_suspend_notifications', '0'));
   $config->save();
 
   update_variable_del('flag_notify_use_default_events');
