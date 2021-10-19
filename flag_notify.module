@@ -5,6 +5,20 @@
  * Functions for this module.
  */
 
+define('FLAG_NOTIFY_DEFAULT_NOTIFICATION_SUBJECT', 'New: "[content:title]"');
+define('FLAG_NOTIFY_DEFAULT_NOTIFICATION_BODY', '[content:body]
+----
+
+You can view the discussion here:
+[content:url]
+
+You are receiving this email because you asked to be notified of new content on this topic. You can unsubscribe by clicking [content:unflag] at the URL above.
+
+--
+[site:name] team
+[site:url]');
+
+
 /**
  * Load the necessary include files.
  */
@@ -533,6 +547,11 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     // Notifications are suspended.
     return;
   }
+  $acting_user = $GLOBALS['user'];
+  if ($acting_user->uid == $tuser->uid) {
+    // No need to send notification to self!
+    return;
+  }
 
   $site_name = config_get('system.core', 'site_name');
   $site_email = config_get('system.core', 'site_mail');
@@ -540,11 +559,6 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
   $tuser = user_load($targetuser_uid);
   $tuser_name = $tuser->name;
   $language = user_preferred_language($tuser);
-  $acting_user = $GLOBALS['user'];
-  //if ($acting_user->uid == $tuser->uid) {
-//  // No need to send notification to the acting user!
-//  return;
-  //}
 
   if ($notification_type == 'comment') {
     $comment_subscription = $config->get('comment_subscription');
@@ -694,8 +708,25 @@ function flag_notify_fire_email($event, $group, $node, $comment, $user, $targetu
     $content_unflag_text,
     $content_author,
   );
-  $params['subject'] = str_replace($search, $replace, $subject);
-  $params['body'] = str_replace($search, $replace, $body);
+
+  if (empty(trim($subject))) {
+    $subject = FLAG_NOTIFY_DEFAULT_NOTIFICATION_SUBJECT;
+  }
+  if (empty(trim($body))) {
+    $body = FLAG_NOTIFY_DEFAULT_NOTIFICATION_BODY;
+  }
+
+  $subject = str_replace($search, $replace, $subject);
+  $body = str_replace($search, $replace, $body);
+  $body = filter_xss_admin(token_replace($body, array(
+          'node' => $node,
+          'comment' => $comment,
+          'user' => $tuser,
+        ), array(
+          'sanitize' => FALSE,
+        )));
+  $params['subject'] = $subject;
+  $params['body'] = $body;
 
   $result = backdrop_mail('flag_notify', 'notification_email', $tuser->mail, $language, $params, $site_email, TRUE);
 

@@ -13,9 +13,9 @@ function flag_notify_install() {
   $default_notification_field_name = "flag_notify_field_defaults";
   if (!field_info_field($default_notification_field_name)) {
     // Check if the field already exists.
-    $description = $t('Select the ​​default notification options when you create a content or leave a comment. These default options can be overridden on each content or comment.');
+    $description = $t('Select the ​​default notification options when you create content or leave a comment. These default options can be overridden individually.');
     $allowed_values = array(
-      'content' => $t('New comments and modifications on contents I create'),
+      'content' => $t('New comments or edits on content I create'),
       'comment' => $t('Replies to my comments'),
     );
     $default_value = array(
@@ -27,7 +27,7 @@ function flag_notify_install() {
       $description = $t('Select the ​​default notification options when you join a group, create a content or leave a comment. These default options can be overridden on each group, content or comment.');
       $allowed_values = array(
         'group' => $t('Activity in the groups I join'),
-        'content' => $t('New comments and modifications on contents I create'),
+        'content' => $t('New comments or edits on content I create'),
         'comment' => $t('Replies to my comments'),
       );
       $default_value = array(
@@ -50,7 +50,7 @@ function flag_notify_install() {
       'field_name' => $default_notification_field_name,
       'entity_type' => 'user',
       'bundle' => 'user',
-      'label' => $t('Default notifications settings.'),
+      'label' => $t('Default notification settings'),
       'description' => $description,
       'required' => FALSE,
       'widget' => array(
@@ -59,8 +59,6 @@ function flag_notify_install() {
       'default_value' => $default_value,
     ));
   }
-  // Dynamically generated variable data was detected on the following lines.
-  // /flag_notify/flag_notify_settings.inc line 60
 }
 
 /**
